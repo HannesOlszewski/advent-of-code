@@ -73,6 +73,7 @@ function parseInput(input: string[]): Game[] {
 const input = fs.readFileSync("input.txt", "utf8").split("\n");
 
 const games = parseInput(input);
+
 const possibleGames = games.filter((game) =>
   game.revealedSets.every(
     (revealedSet) =>
@@ -83,6 +84,22 @@ const possibleGames = games.filter((game) =>
 );
 const sumOfIds = possibleGames.reduce((acc, game) => acc + game.id, 0);
 
+const minimalBagsPerGame = games.map((game) =>
+  game.revealedSets.reduce(
+    (acc, revealedSet) => ({
+      red: Math.max(acc.red, revealedSet.red),
+      green: Math.max(acc.green, revealedSet.green),
+      blue: Math.max(acc.blue, revealedSet.blue),
+    }),
+    { red: 0, green: 0, blue: 0 }
+  )
+);
+const powers = minimalBagsPerGame.map(
+  (minimalBag) => minimalBag.red * minimalBag.green * minimalBag.blue
+);
+const sumOfPowers = powers.reduce((acc, power) => acc + power, 0);
+
 console.log(`Games: ${games.length}`);
 console.log(`Possible games: ${possibleGames.length}`);
 console.log(`Sum of ids: ${sumOfIds}`);
+console.log(`Sum of powers: ${sumOfPowers}`);
