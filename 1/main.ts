@@ -1,10 +1,36 @@
 import fs from "fs";
 
+const spelledNumbers = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+];
+
 function parseNumbersFromInputLine(line: string): number[] {
-  return line
-    .split("")
-    .map((num) => parseInt(num, 10))
-    .filter((num) => !Number.isNaN(num));
+  const numbers: number[] = [];
+
+  for (let i = 0; i < line.length; i++) {
+    const parsedNumber = parseInt(line.charAt(i), 10);
+
+    if (!Number.isNaN(parsedNumber)) {
+      numbers.push(parsedNumber);
+    }
+
+    for (const spelledNumber of spelledNumbers) {
+      if (line.indexOf(spelledNumber, i) === i) {
+        numbers.push(spelledNumbers.indexOf(spelledNumber));
+      }
+    }
+  }
+
+  return numbers;
 }
 
 function getTwoDigitNumberFromInputLine(line: string): number {
