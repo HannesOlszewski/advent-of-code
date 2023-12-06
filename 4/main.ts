@@ -4,15 +4,11 @@ interface Scratchcard {
   id: number;
   winningNumbers: number[];
   ownNumbers: number[];
+  matchingNumbers: number[];
   numPoints: number;
 }
 
-function calculatePoints(
-  winningNumbers: number[],
-  ownNumbers: number[]
-): number {
-  const matchingNumbers = ownNumbers.filter((n) => winningNumbers.includes(n));
-
+function calculatePoints(matchingNumbers: number[]): number {
   if (matchingNumbers.length === 0) {
     return 0;
   }
@@ -33,12 +29,14 @@ function parseInputLine(line: string): Scratchcard {
     .split(" ")
     .map((n) => parseInt(n, 10))
     .filter((n) => !Number.isNaN(n));
-  const numPoints = calculatePoints(winningNumbers, ownNumbers);
+  const matchingNumbers = ownNumbers.filter((n) => winningNumbers.includes(n));
+  const numPoints = calculatePoints(matchingNumbers);
 
   return {
     id,
     winningNumbers,
     ownNumbers,
+    matchingNumbers,
     numPoints,
   };
 }
@@ -54,4 +52,32 @@ const totalPoints = initialScratchcards.reduce(
   0
 );
 
+const cardCounts: Record<number, number> = {};
+
+initialScratchcards.forEach((scratchcard) => {
+  if (scratchcard.id in cardCounts) {
+    cardCounts[scratchcard.id]++;
+  } else {
+    cardCounts[scratchcard.id] = 1;
+  }
+
+  const numMatchingNumbers = scratchcard.matchingNumbers.length;
+
+  for (let i = 1; i <= numMatchingNumbers; i++) {
+    const cardId = scratchcard.id + i;
+
+    if (cardId in cardCounts) {
+      cardCounts[cardId] += cardCounts[scratchcard.id];
+    } else {
+      cardCounts[cardId] = cardCounts[scratchcard.id];
+    }
+  }
+});
+
+const totalNumCards = Object.values(cardCounts).reduce(
+  (sum, count) => sum + count,
+  0
+);
+
 console.log(totalPoints);
+console.log(totalNumCards);
