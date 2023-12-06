@@ -1,136 +1,169 @@
 import fs from "fs";
 
-type Cell = {
+interface NumberCell {
+  value: number;
   row: number;
-  column: number;
-  isDigit: boolean;
-  isSymbol: boolean;
-  value: number | string;
-  adjacentSymbols: Cell[];
-};
-
-function parseInput(lines: string[]): Cell[][] {
-  return lines.map((line, rowIndex) => {
-    return line.split("").map((char, columnIndex) => {
-      const parsedChar = parseInt(char, 10);
-      const isDigit = !Number.isNaN(parsedChar);
-      const isSymbol = Number.isNaN(parsedChar) && char !== ".";
-      const value = isDigit ? parsedChar : char;
-
-      return {
-        row: rowIndex,
-        column: columnIndex,
-        isDigit,
-        isSymbol,
-        value,
-        adjacentSymbols: [],
-      };
-    });
-  });
+  columns: number[];
 }
 
-function findAdjacedSymbol(cell: Cell, cells: Cell[][]): Cell[] {
-  const result: Cell[] = [];
-  const { row, column } = cell;
+interface SymbolCell {
+  value: string;
+  row: number;
+  column: number;
+}
 
-  const hasTop = row > 0;
-  const hasBottom = row < cells.length - 1;
-  const hasLeft = column > 0;
-  const hasRight = column < cells[row].length - 1;
+interface SymbolWithAdjacentNumbers {
+  adjacentNumbers: NumberCell[];
+  symbol: SymbolCell;
+}
 
-  // tl, t, tr
-  //  l, c, r
-  // bl, b, br
+function parseNumberCellsFromInputRow(
+  row: string,
+  rowIndex: number
+): NumberCell[] {
+  const columns = row.split("");
+  const numbers: NumberCell[] = [];
+  let currentNumber: NumberCell | null = null;
 
-  // tl
-  if (hasTop && hasLeft && cells[row - 1][column - 1].isSymbol) {
-    result.push(cells[row - 1][column - 1]);
+  for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+    const value = columns[columnIndex];
+    const number = parseInt(value, 10);
+
+    if (Number.isNaN(number)) {
+      if (currentNumber !== null) {
+        numbers.push(currentNumber);
+        currentNumber = null;
+      }
+
+      continue;
+    }
+
+    if (currentNumber === null) {
+      currentNumber = {
+        value: number,
+        row: rowIndex,
+        columns: [columnIndex],
+      };
+    } else {
+      currentNumber.value = currentNumber.value * 10 + number;
+      currentNumber.columns.push(columnIndex);
+    }
+
+    if (columnIndex === columns.length - 1) {
+      numbers.push(currentNumber);
+      currentNumber = null;
+    }
   }
 
-  // t
-  if (hasTop && cells[row - 1][column].isSymbol) {
-    result.push(cells[row - 1][column]);
+  return numbers;
+}
+
+function parseSymbolCellsFromInputRow(
+  row: string,
+  rowIndex: number
+): SymbolCell[] {
+  const columns = row.split("");
+  const symbols: SymbolCell[] = [];
+
+  for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+    const value = columns[columnIndex];
+    const number = parseInt(value, 10);
+
+    if (!Number.isNaN(number) || value === ".") {
+      continue;
+    }
+
+    symbols.push({
+      value,
+      row: rowIndex,
+      column: columnIndex,
+    });
   }
 
-  // tr
-  if (hasTop && hasRight && cells[row - 1][column + 1].isSymbol) {
-    result.push(cells[row - 1][column + 1]);
-  }
+  return symbols;
+}
 
-  // l
-  if (hasLeft && cells[row][column - 1].isSymbol) {
-    result.push(cells[row][column - 1]);
-  }
+function hasAdjacentSymbol(number: NumberCell, symbols: SymbolCell[]): boolean {
+  const adjacentSymbols = symbols.filter((symbol) => {
+    const isUpperRow = symbol.row === number.row - 1;
+    const isSameRow = symbol.row === number.row;
+    const isLowerRow = symbol.row === number.row + 1;
+    const isVerticalAdjacentColumn = number.columns.includes(symbol.column);
+    const isHorizontalAdjacentColumn =
+      number.columns.includes(symbol.column - 1) ||
+      number.columns.includes(symbol.column + 1);
 
-  // r
-  if (hasRight && cells[row][column + 1].isSymbol) {
-    result.push(cells[row][column + 1]);
-  }
+    const isTopCorner = isUpperRow && isHorizontalAdjacentColumn;
+    const isBottomCorner = isLowerRow && isHorizontalAdjacentColumn;
+    const isLeftOrRight = isSameRow && isHorizontalAdjacentColumn;
+    const isTop = isUpperRow && isVerticalAdjacentColumn;
+    const isBottom = isLowerRow && isVerticalAdjacentColumn;
 
-  // bl
-  if (hasBottom && hasLeft && cells[row + 1][column - 1].isSymbol) {
-    result.push(cells[row + 1][column - 1]);
-  }
+    return isTopCorner || isBottomCorner || isLeftOrRight || isTop || isBottom;
+  });
 
-  // b
-  if (hasBottom && cells[row + 1][column].isSymbol) {
-    result.push(cells[row + 1][column]);
-  }
+  return adjacentSymbols.length > 0;
+}
 
-  // br
-  if (hasBottom && hasRight && cells[row + 1][column + 1].isSymbol) {
-    result.push(cells[row + 1][column + 1]);
-  }
+function sumArray(array: number[]): number {
+  return array.reduce((sum, number) => sum + number, 0);
+}
 
-  return result;
+function symbolWithAdjacentNumbers(
+  symbol: SymbolCell,
+  numbers: NumberCell[]
+): SymbolWithAdjacentNumbers {
+  const adjacentNumbers = numbers.filter((number) => {
+    const isUpperRow = symbol.row === number.row - 1;
+    const isSameRow = symbol.row === number.row;
+    const isLowerRow = symbol.row === number.row + 1;
+    const isVerticalAdjacentColumn = number.columns.includes(symbol.column);
+    const isHorizontalAdjacentColumn =
+      number.columns.includes(symbol.column - 1) ||
+      number.columns.includes(symbol.column + 1);
+
+    const isTopCorner = isUpperRow && isHorizontalAdjacentColumn;
+    const isBottomCorner = isLowerRow && isHorizontalAdjacentColumn;
+    const isLeftOrRight = isSameRow && isHorizontalAdjacentColumn;
+    const isTop = isUpperRow && isVerticalAdjacentColumn;
+    const isBottom = isLowerRow && isVerticalAdjacentColumn;
+
+    return isTopCorner || isBottomCorner || isLeftOrRight || isTop || isBottom;
+  });
+
+  return { adjacentNumbers, symbol };
+}
+
+function isGear(symbol: SymbolWithAdjacentNumbers): boolean {
+  return symbol.symbol.value === "*" && symbol.adjacentNumbers.length === 2;
 }
 
 const input = fs.readFileSync("input.txt", "utf8").split("\n");
-const schematic = parseInput(input);
 
-schematic.forEach((row) => {
-  row.forEach((cell) => {
-    if (cell.isDigit) {
-      const adjacedSymbols = findAdjacedSymbol(cell, schematic);
-      cell.adjacentSymbols = adjacedSymbols;
-    }
-  });
+const parsedNumbers: NumberCell[] = input.flatMap(parseNumberCellsFromInputRow);
+const parsedSymbols: SymbolCell[] = input.flatMap(parseSymbolCellsFromInputRow);
+
+const numbersWithAdjacentSymbols = parsedNumbers.filter((number) =>
+  hasAdjacentSymbol(number, parsedSymbols)
+);
+
+const sumOfNumbers = sumArray(
+  numbersWithAdjacentSymbols.map(({ value }) => value)
+);
+
+const symbolsWithAdjacentNumbers = parsedSymbols.map((symbol) =>
+  symbolWithAdjacentNumbers(symbol, parsedNumbers)
+);
+
+const gears = symbolsWithAdjacentNumbers.filter(isGear);
+
+const gearRatios = gears.map(({ adjacentNumbers }) => {
+  const [firstNumber, secondNumber] = adjacentNumbers;
+
+  return firstNumber.value * secondNumber.value;
 });
 
-const numbers: Cell[][] = schematic.flatMap((row) => {
-  const numbersInRow: Cell[][] = [];
-  let currentNumber: Cell[] = [];
+const sumOfGearRatios = sumArray(gearRatios);
 
-  for (let i = 0; i < row.length; i++) {
-    const cell = row[i];
-
-    if (cell.isDigit) {
-      currentNumber.push(cell);
-    }
-
-    const isLastCell = i === row.length - 1;
-
-    if (currentNumber.length > 0 && (!cell.isDigit || isLastCell)) {
-      numbersInRow.push(currentNumber);
-      currentNumber = [];
-    }
-  }
-
-  return numbersInRow;
-});
-
-const numbersWithAdjacedSymbols = numbers.filter((number) =>
-  number.some((cell) => cell.adjacentSymbols.length > 0)
-);
-const numbersAsActualNumbers: number[] = numbersWithAdjacedSymbols.map(
-  (number) => {
-    return parseInt(number.map((cell) => cell.value).join(""), 10);
-  }
-);
-
-const sumOfNumbers = numbersAsActualNumbers.reduce(
-  (acc, number) => acc + number,
-  0
-);
-
-console.log(sumOfNumbers);
+console.log(sumOfNumbers); // 532445
+console.log(sumOfGearRatios); // 79842967
