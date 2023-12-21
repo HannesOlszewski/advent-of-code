@@ -41,16 +41,22 @@ function parseInput(input: string): Hand[] {
 }
 
 function getHandType(hand: Hand): HandType {
-  const isFiveOfAKind = hand.cards.every((card) => card === hand.cards[0]);
+  let isFiveOfAKind = hand.cards.every((card) => card === hand.cards[0]);
   let isFourOfAKind = false;
   let isFullHouse = false;
   let isThreeOfAKind = false;
   let isTwoPairs = false;
   let isOnePair = false;
+  let numJokers = 0;
   const pairTypes: Card[] = [];
 
   for (const card of hand.cards) {
     const count = hand.cards.filter((c) => c === card).length;
+
+    if (card === "J") {
+      numJokers++;
+      continue;
+    }
 
     if (count === 4) {
       isFourOfAKind = true;
@@ -73,6 +79,36 @@ function getHandType(hand: Hand): HandType {
 
       pairTypes.push(card);
     }
+  }
+
+  if (numJokers === 1) {
+    if (isFourOfAKind) {
+      isFiveOfAKind = true;
+    } else if (isThreeOfAKind) {
+      isFourOfAKind = true;
+    } else if (isTwoPairs) {
+      isFullHouse = true;
+    } else if (isOnePair) {
+      isThreeOfAKind = true;
+    } else {
+      isOnePair = true;
+    }
+  } else if (numJokers === 2) {
+    if (isThreeOfAKind) {
+      isFiveOfAKind = true;
+    } else if (isOnePair) {
+      isFourOfAKind = true;
+    } else {
+      isThreeOfAKind = true;
+    }
+  } else if (numJokers === 3) {
+    if (isOnePair) {
+      isFiveOfAKind = true;
+    } else {
+      isFourOfAKind = true;
+    }
+  } else if (numJokers === 4 || numJokers === 5) {
+    isFiveOfAKind = true;
   }
 
   if (isFiveOfAKind) {
@@ -119,8 +155,6 @@ function getCardStrength(card: Card): number {
       return 13;
     case "Q":
       return 12;
-    case "J":
-      return 11;
     case "T":
       return 10;
     case "9":
@@ -139,6 +173,8 @@ function getCardStrength(card: Card): number {
       return 3;
     case "2":
       return 2;
+    case "J":
+      return 1;
   }
 }
 
@@ -161,10 +197,8 @@ function compareHands(hand1: Hand, hand2: Hand): number {
   const handOneStrength = getHandTypeStrength(getHandType(hand1));
   const handTwoStrength = getHandTypeStrength(getHandType(hand2));
 
-  if (handOneStrength > handTwoStrength) {
-    return 1;
-  } else if (handOneStrength < handTwoStrength) {
-    return -1;
+  if (handOneStrength !== handTwoStrength) {
+    return handOneStrength - handTwoStrength;
   }
 
   return compareHandsOfSameType(hand1, hand2);
