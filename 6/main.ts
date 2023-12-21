@@ -8,6 +8,9 @@ interface RaceInput {
 function parseLine(line: string): number[] {
   return line
     .split(" ")
+    .filter((x) => x !== "")
+    .join("")
+    .split(":")
     .map((x) => parseInt(x, 10))
     .filter((x) => !isNaN(x));
 }
