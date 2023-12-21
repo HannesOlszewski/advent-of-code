@@ -1,117 +1,121 @@
 import fs from "fs";
 
-interface Mapping {
-  seed: number;
-  soil?: number;
-  fertilizer?: number;
-  water?: number;
-  light?: number;
-  temperature?: number;
-  humidity?: number;
-  location?: number;
+interface Range {
+  rangeStart: number;
+  rangeLength: number;
 }
 
-type MappingType = keyof Mapping;
+interface Mapping {
+  targetStart: number;
+  sourceStart: number;
+  periodLength: number;
+}
 
-function parseSeeds(line: string): Mapping[] {
+function parseSeeds(line: string): Range[] {
   if (!line.startsWith("seeds:")) {
     throw new Error("Invalid seeds line");
   }
 
-  return line
+  const values = line
     .split(" ")
-    .slice(1)
-    .map((seed) => ({ seed: parseInt(seed) }));
+    // Remove "seeds:"
+    .slice(1);
+
+  const ranges: Range[] = [];
+
+  for (let i = 0; i < values.length; i += 2) {
+    const rangeStart = parseInt(values[i]);
+    const rangeLength = parseInt(values[i + 1]);
+
+    ranges.push({ rangeStart, rangeLength });
+  }
+
+  return ranges;
 }
 
-function parseMapsAndAddToExistingMappings(
-  lines: string[],
-  mappings: Mapping[]
-): Mapping[] {
-  let currentSource: MappingType | null = null;
-  let currentDestination: MappingType | null = null;
-  let mappingsCopy = mappings.slice();
+function parseMaps(lines: string[]): Mapping[] {
+  const mappings: Mapping[] = [];
 
   for (const line of lines) {
     if (line.length === 0) {
-      if (currentSource !== null && currentDestination !== null) {
-        mappingsCopy = mappingsCopy.map((mapping) => {
-          if (
-            mapping[currentDestination!] === undefined &&
-            mapping[currentSource!] !== undefined
-          ) {
-            mapping[currentDestination!] = mapping[currentSource!]!;
-          }
+      continue;
+    }
 
-          return mapping;
+    const [targetStart, sourceStart, periodLength] = line.split(" ");
+
+    mappings.push({
+      targetStart: parseInt(targetStart),
+      sourceStart: parseInt(sourceStart),
+      periodLength: parseInt(periodLength),
+    });
+  }
+
+  return mappings;
+}
+
+const sections = fs.readFileSync("input.txt", "utf8").split("\n\n");
+
+const seeds = parseSeeds(sections[0]).sort(
+  (a, b) => a.rangeStart - b.rangeStart
+);
+const mappings = sections
+  .slice(1)
+  .map((section) => parseMaps(section.split("\n").slice(1)))
+  .sort((a, b) => a[0].targetStart - b[0].targetStart);
+
+const currentTargets: Range[] = seeds;
+
+for (const mapping of mappings) {
+  const currentTargetsCopy = [...currentTargets];
+  currentTargets.splice(0, currentTargets.length);
+
+  for (const target of currentTargetsCopy) {
+    const targetEnd = target.rangeStart + target.rangeLength;
+
+    for (const map of mapping) {
+      const sourceEnd = map.sourceStart + map.periodLength;
+
+      if (target.rangeStart > sourceEnd || map.sourceStart > targetEnd) {
+        continue;
+      }
+
+      // In case of partial match add the non-overlapped parts back to the list
+      if (target.rangeStart < map.sourceStart) {
+        currentTargets.push({
+          rangeStart: target.rangeStart,
+          rangeLength: map.sourceStart - target.rangeStart,
         });
       }
 
-      currentSource = null;
-      currentDestination = null;
-      continue;
-    }
-
-    if (line.endsWith("map:")) {
-      const [left] = line.split(" ");
-      [currentSource, currentDestination] = left.split("-to-") as MappingType[];
-      continue;
-    }
-
-    if (currentSource === null || currentDestination === null) {
-      throw new Error("Invalid mapping");
-    }
-
-    const [
-      destinationPeriodStartString,
-      sourcePeriodStartString,
-      periodLengthString,
-    ] = line.split(" ");
-
-    const periodLength = parseInt(periodLengthString);
-    const sourcePeriodStart = parseInt(sourcePeriodStartString);
-    const sourcePeriodEnd = sourcePeriodStart + periodLength;
-    const destinationPeriodStart = parseInt(destinationPeriodStartString);
-    const destinationPeriodEnd = destinationPeriodStart + periodLength;
-
-    mappingsCopy = mappingsCopy.map((mapping) => {
-      const sourceValue = mapping[currentSource!]!;
-
-      if (sourceValue >= sourcePeriodStart && sourceValue < sourcePeriodEnd) {
-        const destinationValue =
-          ((sourceValue - sourcePeriodStart) /
-            (sourcePeriodEnd - sourcePeriodStart)) *
-            (destinationPeriodEnd - destinationPeriodStart) +
-          destinationPeriodStart;
-
-        mapping[currentDestination!] = Math.round(destinationValue);
+      if (targetEnd > sourceEnd) {
+        currentTargets.push({
+          rangeStart: sourceEnd,
+          rangeLength: targetEnd - sourceEnd,
+        });
       }
 
-      return mapping;
-    });
+      // Add the overlapped part to the list
+      const [offset, overlapStart] =
+        map.sourceStart < target.rangeStart
+          ? [target.rangeStart - map.sourceStart, target.rangeStart]
+          : [0, map.sourceStart];
+      const overlapRangeLength = Math.min(targetEnd, sourceEnd) - overlapStart;
+
+      currentTargets.push({
+        rangeStart: map.targetStart + offset,
+        rangeLength: overlapRangeLength,
+      });
+      break;
+    }
+
+    // If no mapping found add the whole target to the list
+    if (currentTargets.length === 0) {
+      console.log("No mapping found for", target);
+      currentTargets.push(target);
+    }
   }
-
-  if (currentSource !== null && currentDestination !== null) {
-    mappingsCopy = mappingsCopy.map((mapping) => {
-      if (
-        mapping[currentDestination!] === undefined &&
-        mapping[currentSource!] !== undefined
-      ) {
-        mapping[currentDestination!] = mapping[currentSource!]!;
-      }
-
-      return mapping;
-    });
-  }
-
-  return mappingsCopy;
 }
 
-const input = fs.readFileSync("input.txt", "utf8").split("\n");
+const lowest = Math.min(...currentTargets.map((t) => t.rangeStart));
 
-const mappings = parseSeeds(input[0]);
-const allMappings = parseMapsAndAddToExistingMappings(input.slice(2), mappings);
-const locations = allMappings.map((mapping) => mapping.location!);
-const lowestLocation = Math.min(...locations);
-
-console.log(lowestLocation);
+console.log(lowest);
