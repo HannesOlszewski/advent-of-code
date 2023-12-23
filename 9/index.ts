@@ -31,19 +31,37 @@ function buildSubSequences(sequence: Sequence): Sequence {
   return subSequence;
 }
 
-function extrapolateSequence(sequence: Sequence): number {
+function extrapolateSequenceForward(sequence: Sequence): number {
   if (!sequence.subSequence) {
     sequence.values.push(0);
 
     return 0;
   }
 
-  const nextSubSequenceValue = extrapolateSequence(sequence.subSequence);
+  const nextSubSequenceValue = extrapolateSequenceForward(sequence.subSequence);
 
   const nextValue =
     sequence.values[sequence.values.length - 1] + nextSubSequenceValue;
 
   sequence.values.push(nextValue);
+
+  return nextValue;
+}
+
+function extrapolateSequenceBackward(sequence: Sequence): number {
+  if (!sequence.subSequence) {
+    sequence.values.unshift(0);
+
+    return 0;
+  }
+
+  const nextSubSequenceValue = extrapolateSequenceBackward(
+    sequence.subSequence
+  );
+
+  const nextValue = sequence.values[0] - nextSubSequenceValue;
+
+  sequence.values.unshift(nextValue);
 
   return nextValue;
 }
@@ -58,13 +76,24 @@ export function partOne(input: string): number {
     };
   });
 
-  const nextValues = subSequences.map(extrapolateSequence);
+  const nextValues = subSequences.map(extrapolateSequenceForward);
 
   return nextValues.reduce((acc, value) => acc + value, 0);
 }
 
 export function partTwo(input: string): number {
-  return 0;
+  const sequences = parseInput(input);
+
+  const subSequences = sequences.map((sequence) => {
+    return {
+      ...sequence,
+      subSequence: buildSubSequences(sequence),
+    };
+  });
+
+  const nextValues = subSequences.map(extrapolateSequenceBackward);
+
+  return nextValues.reduce((acc, value) => acc + value, 0);
 }
 
 export function dayNine(input: string): [number, number] {

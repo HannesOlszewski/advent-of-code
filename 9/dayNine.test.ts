@@ -12,8 +12,8 @@ describe("dayNine", () => {
   });
 
   describe("partTwo", () => {
-    it("returns 0", () => {
-      expect(partTwo("")).toEqual(0);
+    it("returns 2", () => {
+      expect(partTwo(input)).toEqual(2);
     });
   });
 });
