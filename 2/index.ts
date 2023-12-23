@@ -1,5 +1,3 @@
-import fs from "fs";
-
 type RevealedSet = {
   red: number;
   green: number;
@@ -70,36 +68,42 @@ function parseInput(input: string[]): Game[] {
   return input.map(parseInputLine);
 }
 
-const input = fs.readFileSync("input.txt", "utf8").split("\n");
+export function partOne(input: string): number {
+  const games = parseInput(input.split("\n"));
 
-const games = parseInput(input);
+  const possibleGames = games.filter((game) =>
+    game.revealedSets.every(
+      (revealedSet) =>
+        revealedSet.red <= bag.red &&
+        revealedSet.green <= bag.green &&
+        revealedSet.blue <= bag.blue
+    )
+  );
 
-const possibleGames = games.filter((game) =>
-  game.revealedSets.every(
-    (revealedSet) =>
-      revealedSet.red <= bag.red &&
-      revealedSet.green <= bag.green &&
-      revealedSet.blue <= bag.blue
-  )
-);
-const sumOfIds = possibleGames.reduce((acc, game) => acc + game.id, 0);
+  return possibleGames.reduce((acc, game) => acc + game.id, 0);
+}
 
-const minimalBagsPerGame = games.map((game) =>
-  game.revealedSets.reduce(
-    (acc, revealedSet) => ({
-      red: Math.max(acc.red, revealedSet.red),
-      green: Math.max(acc.green, revealedSet.green),
-      blue: Math.max(acc.blue, revealedSet.blue),
-    }),
-    { red: 0, green: 0, blue: 0 }
-  )
-);
-const powers = minimalBagsPerGame.map(
-  (minimalBag) => minimalBag.red * minimalBag.green * minimalBag.blue
-);
-const sumOfPowers = powers.reduce((acc, power) => acc + power, 0);
+export function partTwo(input: string): number {
+  const games = parseInput(input.split("\n"));
 
-console.log(`Games: ${games.length}`);
-console.log(`Possible games: ${possibleGames.length}`);
-console.log(`Sum of ids: ${sumOfIds}`);
-console.log(`Sum of powers: ${sumOfPowers}`);
+  const minimalBagsPerGame = games.map((game) =>
+    game.revealedSets.reduce(
+      (acc, revealedSet) => ({
+        red: Math.max(acc.red, revealedSet.red),
+        green: Math.max(acc.green, revealedSet.green),
+        blue: Math.max(acc.blue, revealedSet.blue),
+      }),
+      { red: 0, green: 0, blue: 0 }
+    )
+  );
+
+  const powers = minimalBagsPerGame.map(
+    (minimalBag) => minimalBag.red * minimalBag.green * minimalBag.blue
+  );
+
+  return powers.reduce((acc, power) => acc + power, 0);
+}
+
+export function dayTwo(input: string): [number, number] {
+  return [partOne(input), partTwo(input)];
+}

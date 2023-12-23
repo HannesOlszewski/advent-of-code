@@ -1,5 +1,3 @@
-import fs from "fs";
-
 type Card =
   | "A"
   | "K"
@@ -40,6 +38,8 @@ function parseInput(input: string): Hand[] {
   });
 }
 
+let jIsJokerWildcard = false;
+
 function getHandType(hand: Hand): HandType {
   let isFiveOfAKind = hand.cards.every((card) => card === hand.cards[0]);
   let isFourOfAKind = false;
@@ -53,7 +53,7 @@ function getHandType(hand: Hand): HandType {
   for (const card of hand.cards) {
     const count = hand.cards.filter((c) => c === card).length;
 
-    if (card === "J") {
+    if (card === "J" && jIsJokerWildcard) {
       numJokers++;
       continue;
     }
@@ -81,34 +81,36 @@ function getHandType(hand: Hand): HandType {
     }
   }
 
-  if (numJokers === 1) {
-    if (isFourOfAKind) {
+  if (jIsJokerWildcard && numJokers > 0) {
+    if (numJokers === 1) {
+      if (isFourOfAKind) {
+        isFiveOfAKind = true;
+      } else if (isThreeOfAKind) {
+        isFourOfAKind = true;
+      } else if (isTwoPairs) {
+        isFullHouse = true;
+      } else if (isOnePair) {
+        isThreeOfAKind = true;
+      } else {
+        isOnePair = true;
+      }
+    } else if (numJokers === 2) {
+      if (isThreeOfAKind) {
+        isFiveOfAKind = true;
+      } else if (isOnePair) {
+        isFourOfAKind = true;
+      } else {
+        isThreeOfAKind = true;
+      }
+    } else if (numJokers === 3) {
+      if (isOnePair) {
+        isFiveOfAKind = true;
+      } else {
+        isFourOfAKind = true;
+      }
+    } else if (numJokers === 4 || numJokers === 5) {
       isFiveOfAKind = true;
-    } else if (isThreeOfAKind) {
-      isFourOfAKind = true;
-    } else if (isTwoPairs) {
-      isFullHouse = true;
-    } else if (isOnePair) {
-      isThreeOfAKind = true;
-    } else {
-      isOnePair = true;
     }
-  } else if (numJokers === 2) {
-    if (isThreeOfAKind) {
-      isFiveOfAKind = true;
-    } else if (isOnePair) {
-      isFourOfAKind = true;
-    } else {
-      isThreeOfAKind = true;
-    }
-  } else if (numJokers === 3) {
-    if (isOnePair) {
-      isFiveOfAKind = true;
-    } else {
-      isFourOfAKind = true;
-    }
-  } else if (numJokers === 4 || numJokers === 5) {
-    isFiveOfAKind = true;
   }
 
   if (isFiveOfAKind) {
@@ -128,64 +130,40 @@ function getHandType(hand: Hand): HandType {
   }
 }
 
-function getHandTypeStrength(handType: HandType): number {
-  switch (handType) {
-    case "Five of a Kind":
-      return 6;
-    case "Four of a Kind":
-      return 5;
-    case "Full House":
-      return 4;
-    case "Three of a Kind":
-      return 3;
-    case "Two Pairs":
-      return 2;
-    case "One Pair":
-      return 1;
-    case "High Card":
-      return 0;
-  }
-}
+const handTypeStrength: Record<HandType, number> = {
+  "Five of a Kind": 6,
+  "Four of a Kind": 5,
+  "Full House": 4,
+  "Three of a Kind": 3,
+  "Two Pairs": 2,
+  "One Pair": 1,
+  "High Card": 0,
+};
 
-function getCardStrength(card: Card): number {
-  switch (card) {
-    case "A":
-      return 14;
-    case "K":
-      return 13;
-    case "Q":
-      return 12;
-    case "T":
-      return 10;
-    case "9":
-      return 9;
-    case "8":
-      return 8;
-    case "7":
-      return 7;
-    case "6":
-      return 6;
-    case "5":
-      return 5;
-    case "4":
-      return 4;
-    case "3":
-      return 3;
-    case "2":
-      return 2;
-    case "J":
-      return 1;
-  }
-}
+const cardStrength: Record<Card, number> = {
+  A: 14,
+  K: 13,
+  Q: 12,
+  J: 11,
+  T: 10,
+  "9": 9,
+  "8": 8,
+  "7": 7,
+  "6": 6,
+  "5": 5,
+  "4": 4,
+  "3": 3,
+  "2": 2,
+};
 
 function compareHandsOfSameType(hand1: Hand, hand2: Hand): number {
   for (let i = 0; i < hand1.cards.length; i++) {
     const card1 = hand1.cards[i];
     const card2 = hand2.cards[i];
 
-    if (getCardStrength(card1) > getCardStrength(card2)) {
+    if (cardStrength[card1] > cardStrength[card2]) {
       return 1;
-    } else if (getCardStrength(card1) < getCardStrength(card2)) {
+    } else if (cardStrength[card1] < cardStrength[card2]) {
       return -1;
     }
   }
@@ -194,8 +172,8 @@ function compareHandsOfSameType(hand1: Hand, hand2: Hand): number {
 }
 
 function compareHands(hand1: Hand, hand2: Hand): number {
-  const handOneStrength = getHandTypeStrength(getHandType(hand1));
-  const handTwoStrength = getHandTypeStrength(getHandType(hand2));
+  const handOneStrength = handTypeStrength[getHandType(hand1)];
+  const handTwoStrength = handTypeStrength[getHandType(hand2)];
 
   if (handOneStrength !== handTwoStrength) {
     return handOneStrength - handTwoStrength;
@@ -204,10 +182,28 @@ function compareHands(hand1: Hand, hand2: Hand): number {
   return compareHandsOfSameType(hand1, hand2);
 }
 
-const input = fs.readFileSync("input.txt", "utf8");
-const hands: Hand[] = parseInput(input);
-const sortedHands = hands.sort(compareHands);
-const winnings = sortedHands.map((hand, index) => hand.bid * (index + 1));
-const totalWinnings = winnings.reduce((acc, curr) => acc + curr, 0);
+function getTotalWinnings(hands: Hand[]): number {
+  const sortedHands = hands.sort(compareHands);
+  const winnings = sortedHands.map((hand, index) => hand.bid * (index + 1));
 
-console.log(totalWinnings);
+  return winnings.reduce((acc, curr) => acc + curr, 0);
+}
+
+export function partOne(input: string): number {
+  jIsJokerWildcard = false;
+  const hands = parseInput(input);
+
+  return getTotalWinnings(hands);
+}
+
+export function partTwo(input: string): number {
+  jIsJokerWildcard = true;
+  cardStrength.J = 1;
+  const hands = parseInput(input);
+
+  return getTotalWinnings(hands);
+}
+
+export function daySeven(input: string): [number, number] {
+  return [partOne(input), partTwo(input)];
+}

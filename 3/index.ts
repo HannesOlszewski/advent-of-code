@@ -1,5 +1,3 @@
-import fs from "fs";
-
 interface NumberCell {
   value: number;
   row: number;
@@ -138,32 +136,48 @@ function isGear(symbol: SymbolWithAdjacentNumbers): boolean {
   return symbol.symbol.value === "*" && symbol.adjacentNumbers.length === 2;
 }
 
-const input = fs.readFileSync("input.txt", "utf8").split("\n");
+export function partOne(input: string): number {
+  const lines = input.split("\n");
 
-const parsedNumbers: NumberCell[] = input.flatMap(parseNumberCellsFromInputRow);
-const parsedSymbols: SymbolCell[] = input.flatMap(parseSymbolCellsFromInputRow);
+  const parsedNumbers: NumberCell[] = lines.flatMap(
+    parseNumberCellsFromInputRow
+  );
+  const parsedSymbols: SymbolCell[] = lines.flatMap(
+    parseSymbolCellsFromInputRow
+  );
 
-const numbersWithAdjacentSymbols = parsedNumbers.filter((number) =>
-  hasAdjacentSymbol(number, parsedSymbols)
-);
+  const numbersWithAdjacentSymbols = parsedNumbers.filter((number) =>
+    hasAdjacentSymbol(number, parsedSymbols)
+  );
 
-const sumOfNumbers = sumArray(
-  numbersWithAdjacentSymbols.map(({ value }) => value)
-);
+  return sumArray(numbersWithAdjacentSymbols.map(({ value }) => value));
+}
 
-const symbolsWithAdjacentNumbers = parsedSymbols.map((symbol) =>
-  symbolWithAdjacentNumbers(symbol, parsedNumbers)
-);
+export function partTwo(input: string): number {
+  const lines = input.split("\n");
 
-const gears = symbolsWithAdjacentNumbers.filter(isGear);
+  const parsedNumbers: NumberCell[] = lines.flatMap(
+    parseNumberCellsFromInputRow
+  );
+  const parsedSymbols: SymbolCell[] = lines.flatMap(
+    parseSymbolCellsFromInputRow
+  );
 
-const gearRatios = gears.map(({ adjacentNumbers }) => {
-  const [firstNumber, secondNumber] = adjacentNumbers;
+  const symbolsWithAdjacentNumbers = parsedSymbols.map((symbol) =>
+    symbolWithAdjacentNumbers(symbol, parsedNumbers)
+  );
 
-  return firstNumber.value * secondNumber.value;
-});
+  const gears = symbolsWithAdjacentNumbers.filter(isGear);
 
-const sumOfGearRatios = sumArray(gearRatios);
+  const gearRatios = gears.map(({ adjacentNumbers }) => {
+    const [firstNumber, secondNumber] = adjacentNumbers;
 
-console.log(sumOfNumbers); // 532445
-console.log(sumOfGearRatios); // 79842967
+    return firstNumber.value * secondNumber.value;
+  });
+
+  return sumArray(gearRatios);
+}
+
+export function dayThree(input: string): [number, number] {
+  return [partOne(input), partTwo(input)];
+}

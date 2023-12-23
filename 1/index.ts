@@ -1,4 +1,4 @@
-import fs from "fs";
+let shouldParseSpelledNumbers = false;
 
 const spelledNumbers = [
   "zero",
@@ -21,6 +21,10 @@ function parseNumbersFromInputLine(line: string): number[] {
 
     if (!Number.isNaN(parsedNumber)) {
       numbers.push(parsedNumber);
+    }
+
+    if (!shouldParseSpelledNumbers) {
+      continue;
     }
 
     for (const spelledNumber of spelledNumbers) {
@@ -51,8 +55,20 @@ function calculateOutputSum(input: string[]): number {
   return numbers.reduce((sum, number) => sum + number, 0);
 }
 
-const input = fs.readFileSync("input.txt", "utf8").split("\n");
+export function partOne(input: string): number {
+  const lines = input.split("\n");
+  shouldParseSpelledNumbers = false;
 
-const output = calculateOutputSum(input);
+  return calculateOutputSum(lines);
+}
 
-console.log(output);
+export function partTwo(input: string): number {
+  const lines = input.split("\n");
+  shouldParseSpelledNumbers = true;
+
+  return calculateOutputSum(lines);
+}
+
+export function dayOne(input: string): [number, number] {
+  return [partOne(input), partTwo(input)];
+}

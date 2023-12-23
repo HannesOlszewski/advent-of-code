@@ -1,5 +1,3 @@
-import fs from "fs";
-
 interface Scratchcard {
   id: number;
   winningNumbers: number[];
@@ -45,39 +43,42 @@ function parseInput(lines: string[]): Scratchcard[] {
   return lines.map(parseInputLine);
 }
 
-const input = fs.readFileSync("input.txt", "utf8").split("\n");
-const initialScratchcards = parseInput(input);
-const totalPoints = initialScratchcards.reduce(
-  (sum, scratchcard) => sum + scratchcard.numPoints,
-  0
-);
+export function partOne(input: string): number {
+  const initialScratchcards = parseInput(input.split("\n"));
 
-const cardCounts: Record<number, number> = {};
+  return initialScratchcards.reduce(
+    (sum, scratchcard) => sum + scratchcard.numPoints,
+    0
+  );
+}
 
-initialScratchcards.forEach((scratchcard) => {
-  if (scratchcard.id in cardCounts) {
-    cardCounts[scratchcard.id]++;
-  } else {
-    cardCounts[scratchcard.id] = 1;
-  }
+export function partTwo(input: string): number {
+  const initialScratchcards = parseInput(input.split("\n"));
+  const cardCounts: Record<number, number> = {};
 
-  const numMatchingNumbers = scratchcard.matchingNumbers.length;
-
-  for (let i = 1; i <= numMatchingNumbers; i++) {
-    const cardId = scratchcard.id + i;
-
-    if (cardId in cardCounts) {
-      cardCounts[cardId] += cardCounts[scratchcard.id];
+  initialScratchcards.forEach((scratchcard) => {
+    if (scratchcard.id in cardCounts) {
+      cardCounts[scratchcard.id]++;
     } else {
-      cardCounts[cardId] = cardCounts[scratchcard.id];
+      cardCounts[scratchcard.id] = 1;
     }
-  }
-});
 
-const totalNumCards = Object.values(cardCounts).reduce(
-  (sum, count) => sum + count,
-  0
-);
+    const numMatchingNumbers = scratchcard.matchingNumbers.length;
 
-console.log(totalPoints);
-console.log(totalNumCards);
+    for (let i = 1; i <= numMatchingNumbers; i++) {
+      const cardId = scratchcard.id + i;
+
+      if (cardId in cardCounts) {
+        cardCounts[cardId] += cardCounts[scratchcard.id];
+      } else {
+        cardCounts[cardId] = cardCounts[scratchcard.id];
+      }
+    }
+  });
+
+  return Object.values(cardCounts).reduce((sum, count) => sum + count, 0);
+}
+
+export function dayFour(input: string): [number, number] {
+  return [partOne(input), partTwo(input)];
+}

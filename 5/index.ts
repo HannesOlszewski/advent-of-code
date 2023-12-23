@@ -119,3 +119,15 @@ for (const mapping of mappings) {
 const lowest = Math.min(...currentTargets.map((t) => t.rangeStart));
 
 console.log(lowest);
+
+export function partOne(input: string): number {
+  return 0;
+}
+
+export function partTwo(input: string): number {
+  return 0;
+}
+
+export function dayFive(input: string): [number, number] {
+  return [partOne(input), partTwo(input)];
+}
