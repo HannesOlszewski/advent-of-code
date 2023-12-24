@@ -8,6 +8,7 @@ import { daySix } from "./6";
 import { daySeven } from "./7";
 import { dayEight } from "./8";
 import { dayNine } from "./9";
+import { dayTen } from "./10";
 
 interface DayResult {
   day: number;
@@ -80,6 +81,7 @@ function main() {
     7: daySeven,
     8: dayEight,
     9: dayNine,
+    10: dayTen,
   };
 
   let days: string[];
