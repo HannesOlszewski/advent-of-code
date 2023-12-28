@@ -1,4 +1,4 @@
-import { partOne, partTwo } from "./";
+import { partOne, partTwo } from ".";
 
 const input = `467..114..
 ...*......
