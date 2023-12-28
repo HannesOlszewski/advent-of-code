@@ -19,8 +19,16 @@ describe("dayEleven", () => {
   });
 
   describe("partTwo", () => {
-    it("returns 0", () => {
-      expect(partTwo(input)).toEqual(0);
+    it("returns 1030", () => {
+      expect(partTwo(input, 10)).toEqual(1030);
+    });
+
+    it("returns 8410", () => {
+      expect(partTwo(input, 100)).toEqual(8410);
+    });
+
+    it("returns 82210", () => {
+      expect(partTwo(input, 1000)).toEqual(82210);
     });
   });
 });
