@@ -1,11 +1,20 @@
 import { partOne, partTwo } from ".";
 
-const input = ``;
+const input = `...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....`;
 
 describe("dayEleven", () => {
   describe("partOne", () => {
-    it("returns 0", () => {
-      expect(partOne(input)).toEqual(0);
+    it("returns 374", () => {
+      expect(partOne(input)).toEqual(374);
     });
   });
 
