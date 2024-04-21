@@ -20,6 +20,7 @@ func getInput(day string) string {
 func main() {
 	days := map[string]func(string) (int, int){
 		"one": one,
+		"two": two,
 	}
 
 	tbl := table.New("Day", "Part 1", "Part 2", "Duration")
