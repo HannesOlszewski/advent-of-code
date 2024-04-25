@@ -22,6 +22,7 @@ func main() {
 		"one":   one,
 		"two":   two,
 		"three": three,
+		"four":  four,
 	}
 
 	tbl := table.New("Day", "Part 1", "Part 2", "Duration")
