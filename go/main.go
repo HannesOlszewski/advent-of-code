@@ -17,24 +17,30 @@ func getInput(day string) string {
 	return string(data)
 }
 
+type Day struct {
+	name string
+	fn   func(string) (int, int)
+}
+
 func main() {
-	days := map[string]func(string) (int, int){
-		"one":      one,
-		"two":      two,
-		"three":    three,
-		"four":     four,
-		"five":     five,
-		"six":      six,
-		"seven":    seven,
-		"thirteen": thirteen,
-		"fourteen": fourteen,
-		"fifteen":  fifteen,
-		"sixteen":  sixteen,
+	days := []Day{
+		{"one", one},
+		{"two", two},
+		{"three", three},
+		{"four", four},
+		{"five", five},
+		{"six", six},
+		{"seven", seven},
+		{"thirteen", thirteen},
+		{"fourteen", fourteen},
+		{"fifteen", fifteen},
+		{"sixteen", sixteen},
 	}
 
 	tbl := table.New("Day", "Part 1", "Part 2", "Duration")
 
-	for day, fn := range days {
+	for i := 0; i < len(days); i++ {
+		day, fn := days[i].name, days[i].fn
 		input := getInput(day)
 		before := time.Now()
 		partOne, partTwo := fn(input)
