@@ -2,6 +2,10 @@ const std = @import("std");
 const one = @import("one.zig");
 const two = @import("two.zig");
 
+pub const std_options = .{
+    .log_level = .info,
+};
+
 pub fn main() !void {
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
