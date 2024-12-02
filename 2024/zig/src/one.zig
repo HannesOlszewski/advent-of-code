@@ -1,17 +1,17 @@
 const std = @import("std");
 const expectEqual = std.testing.expectEqual;
 
-pub fn partOne(input: []const u8) !i32 {
+pub fn partOne(input: []const u8) !u32 {
     var lines = std.mem.split(u8, input, "\n");
-    var listOne = std.ArrayList(i32).init(std.heap.page_allocator);
+    var listOne = std.ArrayList(u32).init(std.heap.page_allocator);
     defer listOne.deinit();
-    var listTwo = std.ArrayList(i32).init(std.heap.page_allocator);
+    var listTwo = std.ArrayList(u32).init(std.heap.page_allocator);
     defer listTwo.deinit();
-    var numItems: i32 = 0;
-    var sum: i32 = 0;
+    var numItems: u32 = 0;
+    var sum: u32 = 0;
 
     while (lines.next()) |line| {
-        var first: i32 = 0;
+        var first: u32 = 0;
         var l: usize = 0;
 
         while (l < line.len) {
@@ -39,7 +39,7 @@ pub fn partOne(input: []const u8) !i32 {
             try listOne.append(first);
         }
 
-        var last: i32 = 0;
+        var last: u32 = 0;
 
         while (l < line.len) {
             const val = std.fmt.charToDigit(line[l], 10) catch continue;
@@ -97,17 +97,17 @@ test "one part one" {
     try expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !i32 {
+pub fn partTwo(input: []const u8) !u32 {
     var lines = std.mem.split(u8, input, "\n");
-    var listOne = std.AutoHashMap(i32, i32).init(std.heap.page_allocator);
+    var listOne = std.AutoHashMap(u32, u32).init(std.heap.page_allocator);
     defer listOne.deinit();
-    var listTwo = std.AutoHashMap(i32, i32).init(std.heap.page_allocator);
+    var listTwo = std.AutoHashMap(u32, u32).init(std.heap.page_allocator);
     defer listTwo.deinit();
-    var numItems: i32 = 0;
-    var sum: i32 = 0;
+    var numItems: u32 = 0;
+    var sum: u32 = 0;
 
     while (lines.next()) |line| {
-        var first: i32 = 0;
+        var first: u32 = 0;
         var l: usize = 0;
 
         while (l < line.len) {
@@ -125,7 +125,7 @@ pub fn partTwo(input: []const u8) !i32 {
         var prev = listOne.get(first) orelse 0;
         try listOne.put(first, prev + 1);
 
-        var last: i32 = 0;
+        var last: u32 = 0;
 
         while (l < line.len) {
             const val = std.fmt.charToDigit(line[l], 10) catch continue;
