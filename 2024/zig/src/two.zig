@@ -111,7 +111,7 @@ pub fn partTwo(input: []const u8) !u32 {
 
         debug("{s}", .{report});
         var levels = std.mem.split(u8, report, " ");
-        var levelsList = std.ArrayList(u32).init(std.heap.page_allocator);
+        var levelsList = std.ArrayList(u32).init(utils.allocator);
         defer levelsList.deinit();
         var hasSavePermutation = false;
 

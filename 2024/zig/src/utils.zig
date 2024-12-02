@@ -10,3 +10,5 @@ pub fn debug(comptime fmt: []const u8, args: anytype) void {
         std.log.debug(fmt, args);
     }
 }
+
+pub const allocator = if (builtin.is_test) std.testing.allocator else std.heap.page_allocator;
