@@ -1,6 +1,7 @@
 const std = @import("std");
 const one = @import("one.zig");
 const two = @import("two.zig");
+const three = @import("three.zig");
 
 pub const std_options = .{
     .log_level = .info,
@@ -29,5 +30,15 @@ pub fn main() !void {
     resultTwo = try two.partTwo(input);
     end = std.time.microTimestamp();
     try stdout.print("Day 2: {d} in {d}us | {d} in {d}us\n", .{ resultOne, mid - start, resultTwo, end - mid });
+    try bw.flush();
+
+    buffer = undefined;
+    input = try std.fs.cwd().readFile("../inputs/three.txt", &buffer);
+    start = std.time.microTimestamp();
+    resultOne = try three.partOne(input);
+    mid = std.time.microTimestamp();
+    resultTwo = try three.partTwo(input);
+    end = std.time.microTimestamp();
+    try stdout.print("Day 3: {d} in {d}us | {d} in {d}us\n", .{ resultOne, mid - start, resultTwo, end - mid });
     try bw.flush();
 }
