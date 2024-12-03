@@ -26,6 +26,7 @@ type Day struct {
 func main() {
 	days := []Day{
 		{"one", onePartOne, onePartTwo},
+		{"two", twoPartOne, twoPartTwo},
 	}
 
 	tbl := table.New("Day", "Part One Result", "Time", "Part Two Result", "Time")
