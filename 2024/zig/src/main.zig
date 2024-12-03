@@ -2,43 +2,139 @@ const std = @import("std");
 const one = @import("one.zig");
 const two = @import("two.zig");
 const three = @import("three.zig");
+const utils = @import("utils.zig");
 
 pub const std_options = .{
     .log_level = .info,
 };
 
-pub fn main() !void {
+const Day = struct {
+    file: []const u8,
+    partOne: *const fn ([]const u8) anyerror!u32,
+    partTwo: *const fn ([]const u8) anyerror!u32,
+};
+
+const days = [3]Day{ Day{
+    .file = "../inputs/one.txt",
+    .partOne = one.partOne,
+    .partTwo = one.partTwo,
+}, Day{
+    .file = "../inputs/two.txt",
+    .partOne = two.partOne,
+    .partTwo = two.partTwo,
+}, Day{
+    .file = "../inputs/three.txt",
+    .partOne = three.partOne,
+    .partTwo = three.partTwo,
+} };
+
+const Result = struct {
+    partOne: u32,
+    timeOne: i64,
+    partTwo: u32,
+    timeTwo: i64,
+};
+
+fn printResultsTable(results: []const Result) !void {
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
 
+    var resOneLen: usize = 0;
+    var timeOneLen: usize = 0;
+    var resTwoLen: usize = 0;
+    var timeTwoLen: usize = 0;
+
+    for (results) |result| {
+        var buf: [256]u8 = undefined;
+        var len = (try std.fmt.bufPrint(&buf, "{}", .{result.partOne})).len;
+        if (resOneLen < len) {
+            resOneLen = len;
+        }
+
+        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeOne})).len;
+        if (timeOneLen < len) {
+            timeOneLen = len;
+        }
+
+        len = (try std.fmt.bufPrint(&buf, "{}", .{result.partTwo})).len;
+        if (resTwoLen < len) {
+            resTwoLen = len;
+        }
+
+        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeTwo})).len;
+        if (timeTwoLen < len) {
+            timeTwoLen = len;
+        }
+    }
+
+    try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
+    try stdout.print("| Day | Part One Result | Time (us) | Part Two Result | Time (us) |\n", .{});
+    try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
+
+    for (0.., results) |i, result| {
+        const dayNum = i + 1;
+
+        if (dayNum < 10) {
+            try stdout.print("|   {} | ", .{dayNum});
+        } else {
+            try stdout.print("|  {} | ", .{dayNum});
+        }
+
+        var buf: [256]u8 = undefined;
+        var len = (try std.fmt.bufPrint(&buf, "{}", .{result.partOne})).len;
+        while (len < resOneLen or len < "Part One Result".len) {
+            try stdout.print(" ", .{});
+            len += 1;
+        }
+        try stdout.print("{} | ", .{result.partOne});
+
+        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeOne})).len;
+        while (len < timeOneLen or len < "Time (us)".len) {
+            try stdout.print(" ", .{});
+            len += 1;
+        }
+        try stdout.print("{} | ", .{result.timeOne});
+
+        len = (try std.fmt.bufPrint(&buf, "{}", .{result.partTwo})).len;
+        while (len < resTwoLen or len < "Part Two Result".len) {
+            try stdout.print(" ", .{});
+            len += 1;
+        }
+        try stdout.print("{} | ", .{result.partTwo});
+
+        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeTwo})).len;
+        while (len < timeTwoLen or len < "Time (us)".len) {
+            try stdout.print(" ", .{});
+            len += 1;
+        }
+        try stdout.print("{} |\n", .{result.timeTwo});
+    }
+
+    try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
+    try bw.flush();
+}
+
+pub fn main() !void {
     var buffer: [30000]u8 = undefined;
-    var input = try std.fs.cwd().readFile("../inputs/one.txt", &buffer);
-    var start: i64 = std.time.microTimestamp();
-    var resultOne = try one.partOne(input);
-    var mid: i64 = std.time.microTimestamp();
-    var resultTwo = try one.partTwo(input);
-    var end: i64 = std.time.microTimestamp();
-    try stdout.print("Day 1: {d} in {d}us | {d} in {d}us\n", .{ resultOne, mid - start, resultTwo, end - mid });
-    try bw.flush();
+    var results = std.ArrayList(Result).init(utils.allocator);
+    defer results.deinit();
 
-    buffer = undefined;
-    input = try std.fs.cwd().readFile("../inputs/two.txt", &buffer);
-    start = std.time.microTimestamp();
-    resultOne = try two.partOne(input);
-    mid = std.time.microTimestamp();
-    resultTwo = try two.partTwo(input);
-    end = std.time.microTimestamp();
-    try stdout.print("Day 2: {d} in {d}us | {d} in {d}us\n", .{ resultOne, mid - start, resultTwo, end - mid });
-    try bw.flush();
+    for (days) |day| {
+        const input = try std.fs.cwd().readFile(day.file, &buffer);
+        const start: i64 = std.time.microTimestamp();
+        const resultOne = try day.partOne(input);
+        const mid: i64 = std.time.microTimestamp();
+        const resultTwo = try day.partTwo(input);
+        const end: i64 = std.time.microTimestamp();
 
-    buffer = undefined;
-    input = try std.fs.cwd().readFile("../inputs/three.txt", &buffer);
-    start = std.time.microTimestamp();
-    resultOne = try three.partOne(input);
-    mid = std.time.microTimestamp();
-    resultTwo = try three.partTwo(input);
-    end = std.time.microTimestamp();
-    try stdout.print("Day 3: {d} in {d}us | {d} in {d}us\n", .{ resultOne, mid - start, resultTwo, end - mid });
-    try bw.flush();
+        try results.append(Result{
+            .partOne = resultOne,
+            .timeOne = mid - start,
+            .partTwo = resultTwo,
+            .timeTwo = end - mid,
+        });
+    }
+
+    try printResultsTable(results.items);
 }
