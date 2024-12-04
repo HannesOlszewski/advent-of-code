@@ -2,6 +2,7 @@ const std = @import("std");
 const one = @import("one.zig");
 const two = @import("two.zig");
 const three = @import("three.zig");
+const four = @import("four.zig");
 const utils = @import("utils.zig");
 
 pub const std_options = .{
@@ -14,7 +15,7 @@ const Day = struct {
     partTwo: *const fn ([]const u8) anyerror!u32,
 };
 
-const days = [3]Day{ Day{
+const days = [4]Day{ Day{
     .file = "../inputs/one.txt",
     .partOne = one.partOne,
     .partTwo = one.partTwo,
@@ -26,6 +27,10 @@ const days = [3]Day{ Day{
     .file = "../inputs/three.txt",
     .partOne = three.partOne,
     .partTwo = three.partTwo,
+}, Day{
+    .file = "../inputs/four.txt",
+    .partOne = four.partOne,
+    .partTwo = four.partTwo,
 } };
 
 const Result = struct {
