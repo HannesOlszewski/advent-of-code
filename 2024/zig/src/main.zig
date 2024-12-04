@@ -69,7 +69,7 @@ fn printResultsTable(results: []const Result) !void {
     }
 
     try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
-    try stdout.print("| Day | Part One Result | Time (us) | Part Two Result | Time (us) |\n", .{});
+    try stdout.print("| Day | Part One Result | Time (μs) | Part Two Result | Time (μs) |\n", .{});
     try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
 
     for (0.., results) |i, result| {
@@ -90,7 +90,7 @@ fn printResultsTable(results: []const Result) !void {
         try stdout.print("{} | ", .{result.partOne});
 
         len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeOne})).len;
-        while (len < timeOneLen or len < "Time (us)".len) {
+        while (len < timeOneLen or len < "Time (μs)".len - 1) {
             try stdout.print(" ", .{});
             len += 1;
         }
@@ -104,7 +104,7 @@ fn printResultsTable(results: []const Result) !void {
         try stdout.print("{} | ", .{result.partTwo});
 
         len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeTwo})).len;
-        while (len < timeTwoLen or len < "Time (us)".len) {
+        while (len < timeTwoLen or len < "Time (μs)".len - 1) {
             try stdout.print(" ", .{});
             len += 1;
         }
