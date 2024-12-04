@@ -1,4 +1,5 @@
 import one from "./src/one";
+import two from "./src/two";
 
 type Day = {
 	file: string;
@@ -13,7 +14,10 @@ type Result = {
 	"Time Two (ms)": number;
 };
 
-const days: Day[] = [{ file: "../inputs/one.txt", ...one }];
+const days: Day[] = [
+	{ file: "../inputs/one.txt", ...one },
+	{ file: "../inputs/two.txt", ...two },
+];
 const results: { [key: string | number]: Result } = {};
 
 for (const day of days) {
