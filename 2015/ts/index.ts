@@ -2,6 +2,7 @@ import one from "./src/one";
 import two from "./src/two";
 import three from "./src/three";
 import four from "./src/four";
+import five from "./src/five";
 
 type Day = {
 	file: string;
@@ -21,6 +22,7 @@ const days: Day[] = [
 	{ file: "../inputs/two.txt", ...two },
 	{ file: "../inputs/three.txt", ...three },
 	{ file: "../inputs/four.txt", ...four },
+	{ file: "../inputs/five.txt", ...five },
 ];
 const results: { [key: string | number]: Result } = {};
 
