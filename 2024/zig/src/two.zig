@@ -1,7 +1,6 @@
 const std = @import("std");
 const expectEqual = std.testing.expectEqual;
 const utils = @import("utils.zig");
-const debug = utils.debug;
 
 const DirectionNotSet = 0;
 const DirectionAsc = 1;
@@ -18,7 +17,6 @@ pub fn partOne(input: []const u8) !u64 {
             continue;
         }
 
-        debug("{s}", .{report});
         var levels = std.mem.split(u8, report, " ");
         var prevSet = false;
         var prevLvl: u32 = 0;
@@ -32,11 +30,9 @@ pub fn partOne(input: []const u8) !u64 {
             }
 
             currentLvl = try std.fmt.parseInt(u32, lvl, 10);
-            debug("cur={d} pre={d} dir={d}", .{ currentLvl, prevLvl, direction });
 
             if (prevSet) {
                 if (currentLvl == prevLvl) {
-                    debug("{d} == {d}", .{ currentLvl, prevLvl });
                     isSafe = false;
                     break;
                 }
@@ -47,24 +43,20 @@ pub fn partOne(input: []const u8) !u64 {
                     } else if ((currentLvl < prevLvl) and ((prevLvl - currentLvl) <= LvlThreshold)) {
                         direction = DirectionDesc;
                     } else {
-                        debug("Direction could not be set", .{});
                         isSafe = false;
                         break;
                     }
                 } else if (direction == DirectionAsc) {
                     if ((currentLvl < prevLvl) or ((currentLvl - prevLvl) > LvlThreshold)) {
-                        debug("Not ascending", .{});
                         isSafe = false;
                         break;
                     }
                 } else if (direction == DirectionDesc) {
                     if ((currentLvl > prevLvl) or ((prevLvl - currentLvl) > LvlThreshold)) {
-                        debug("Not descending", .{});
                         isSafe = false;
                         break;
                     }
                 } else {
-                    debug("Invalid direction", .{});
                     isSafe = false;
                     break;
                 }
@@ -77,7 +69,6 @@ pub fn partOne(input: []const u8) !u64 {
 
         if (isSafe) {
             safeReports += 1;
-            debug("Safe++", .{});
         }
     }
 
@@ -109,7 +100,6 @@ pub fn partTwo(input: []const u8) !u64 {
             continue;
         }
 
-        debug("{s}", .{report});
         var levels = std.mem.split(u8, report, " ");
         var levelsList = std.ArrayList(u32).init(utils.allocator);
         defer levelsList.deinit();
@@ -133,11 +123,8 @@ pub fn partTwo(input: []const u8) !u64 {
             for (cpy.items) |lvl| {
                 currentLvl = lvl;
 
-                debug("cur={d} pre={d} dir={d}", .{ currentLvl, prevLvl, direction });
-
                 if (prevSet) {
                     if (currentLvl == prevLvl) {
-                        debug("{d} == {d}", .{ currentLvl, prevLvl });
                         isSafe = false;
                         break;
                     }
@@ -148,24 +135,20 @@ pub fn partTwo(input: []const u8) !u64 {
                         } else if ((currentLvl < prevLvl) and ((prevLvl - currentLvl) <= LvlThreshold)) {
                             direction = DirectionDesc;
                         } else {
-                            debug("Direction could not be set", .{});
                             isSafe = false;
                             break;
                         }
                     } else if (direction == DirectionAsc) {
                         if ((currentLvl < prevLvl) or ((currentLvl - prevLvl) > LvlThreshold)) {
-                            debug("Not ascending", .{});
                             isSafe = false;
                             break;
                         }
                     } else if (direction == DirectionDesc) {
                         if ((currentLvl > prevLvl) or ((prevLvl - currentLvl) > LvlThreshold)) {
-                            debug("Not descending", .{});
                             isSafe = false;
                             break;
                         }
                     } else {
-                        debug("Invalid direction", .{});
                         isSafe = false;
                         break;
                     }
@@ -184,7 +167,6 @@ pub fn partTwo(input: []const u8) !u64 {
 
         if (hasSavePermutation) {
             safeReports += 1;
-            debug("Safe++", .{});
         }
     }
 

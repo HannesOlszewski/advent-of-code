@@ -52,8 +52,6 @@ pub fn partOne(input: []const u8) !u64 {
     var second: u32 = 0;
 
     for (input) |c| {
-        // debug("{c} {c} {d}*{d}", .{ c, stateToString(state), first, second });
-
         switch (state) {
             .looking => {
                 state = if (c == 'm') .m else .looking;
@@ -146,8 +144,6 @@ pub fn partTwo(input: []const u8) !u64 {
     var enabled = true;
 
     for (input) |c| {
-        // debug("{c} {c} {d}*{d}", .{ c, stateToString(state), first, second });
-
         switch (c) {
             'm' => {
                 state = if (enabled) .m else .looking;
@@ -193,15 +189,12 @@ pub fn partTwo(input: []const u8) !u64 {
             },
             ')' => {
                 if (state == .second) {
-                    // debug("mul({d},{d})", .{ first, second });
                     result += first * second;
                     first = 0;
                     second = 0;
                 } else if (state == .doOpen) {
-                    // debug("do()", .{});
                     enabled = true;
                 } else if (state == .dontOpen) {
-                    // debug("don't()", .{});
                     enabled = false;
                 }
 
