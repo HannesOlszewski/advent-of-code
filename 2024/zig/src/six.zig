@@ -56,13 +56,13 @@ fn isOnMap(loc: Point) bool {
 
 const size: usize = 130; // full input
 
-pub fn partOne(input: []const u8) !u32 {
+pub fn partOne(input: []const u8) !u64 {
     var lines = std.mem.split(u8, input, "\n");
     var map = [_][size]TileState{[_]TileState{TileState{}} ** size} ** size;
     var loc = Point{ .row = 0, .col = 0 };
     var dir = Direction.up;
     var row: usize = 0;
-    var visitedTiles: u32 = 0;
+    var visitedTiles: u64 = 0;
 
     while (lines.next()) |line| {
         if (line.len == 0) {
@@ -130,14 +130,14 @@ test "six part one" {
     try std.testing.expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !u32 {
+pub fn partTwo(input: []const u8) !u64 {
     var lines = std.mem.split(u8, input, "\n");
     var map = [_][size]TileState{[_]TileState{TileState{}} ** size} ** size;
     var loc = Point{ .row = 0, .col = 0 };
     var guardPost = Point{ .row = 0, .col = 0 };
     var dir = Direction.up;
     var row: usize = 0;
-    var placableObstacles: u32 = 0;
+    var placableObstacles: u64 = 0;
 
     while (lines.next()) |line| {
         if (line.len == 0) {

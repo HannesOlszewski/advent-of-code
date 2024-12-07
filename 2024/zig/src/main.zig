@@ -13,8 +13,8 @@ pub const std_options = .{
 
 const Day = struct {
     file: []const u8,
-    partOne: *const fn ([]const u8) anyerror!u32,
-    partTwo: *const fn ([]const u8) anyerror!u32,
+    partOne: *const fn ([]const u8) anyerror!u64,
+    partTwo: *const fn ([]const u8) anyerror!u64,
 };
 
 const days = [_]Day{ Day{
@@ -44,9 +44,9 @@ const days = [_]Day{ Day{
 } };
 
 const Result = struct {
-    partOne: u32,
+    partOne: u64,
     timeOne: i64,
-    partTwo: u32,
+    partTwo: u64,
     timeTwo: i64,
 };
 

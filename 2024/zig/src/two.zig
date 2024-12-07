@@ -9,9 +9,9 @@ const DirectionDesc = 2;
 
 const LvlThreshold = 3;
 
-pub fn partOne(input: []const u8) !u32 {
+pub fn partOne(input: []const u8) !u64 {
     var lines = std.mem.split(u8, input, "\n");
-    var safeReports: u32 = 0;
+    var safeReports: u64 = 0;
 
     while (lines.next()) |report| {
         if (report.len == 0) {
@@ -100,9 +100,9 @@ test "two part one" {
     try expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !u32 {
+pub fn partTwo(input: []const u8) !u64 {
     var lines = std.mem.split(u8, input, "\n");
-    var safeReports: u32 = 0;
+    var safeReports: u64 = 0;
 
     while (lines.next()) |report| {
         if (report.len == 0) {

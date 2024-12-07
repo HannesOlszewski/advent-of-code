@@ -2,14 +2,14 @@ const std = @import("std");
 const utils = @import("utils.zig");
 const expectEqual = std.testing.expectEqual;
 
-pub fn partOne(input: []const u8) !u32 {
+pub fn partOne(input: []const u8) !u64 {
     var lines = std.mem.split(u8, input, "\n");
     var listOne = std.ArrayList(u32).init(utils.allocator);
     defer listOne.deinit();
     var listTwo = std.ArrayList(u32).init(utils.allocator);
     defer listTwo.deinit();
     var numItems: u32 = 0;
-    var sum: u32 = 0;
+    var sum: u64 = 0;
 
     while (lines.next()) |line| {
         var first: u32 = 0;
@@ -98,14 +98,14 @@ test "one part one" {
     try expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !u32 {
+pub fn partTwo(input: []const u8) !u64 {
     var lines = std.mem.split(u8, input, "\n");
     var listOne = std.AutoHashMap(u32, u32).init(utils.allocator);
     defer listOne.deinit();
     var listTwo = std.AutoHashMap(u32, u32).init(utils.allocator);
     defer listTwo.deinit();
     var numItems: u32 = 0;
-    var sum: u32 = 0;
+    var sum: u64 = 0;
 
     while (lines.next()) |line| {
         var first: u32 = 0;

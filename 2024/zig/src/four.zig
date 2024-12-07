@@ -6,10 +6,10 @@ const Point = struct {
     col: usize,
 };
 
-pub fn partOne(input: []const u8) !u32 {
+pub fn partOne(input: []const u8) !u64 {
     var lines = std.mem.splitScalar(u8, input, '\n');
     var row: usize = 0;
-    var xmasCount: u32 = 0;
+    var xmasCount: u64 = 0;
     var rows = std.ArrayList([]const u8).init(utils.allocator);
     defer rows.deinit();
     var xPoints = std.ArrayList(Point).init(utils.allocator);
@@ -103,10 +103,10 @@ test "four part one" {
     try std.testing.expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !u32 {
+pub fn partTwo(input: []const u8) !u64 {
     var lines = std.mem.splitScalar(u8, input, '\n');
     var row: usize = 0;
-    var xmasCount: u32 = 0;
+    var xmasCount: u64 = 0;
     var rows = std.ArrayList([]const u8).init(utils.allocator);
     defer rows.deinit();
     var aPoints = std.ArrayList(Point).init(utils.allocator);

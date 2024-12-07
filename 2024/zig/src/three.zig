@@ -45,8 +45,8 @@ fn stateToString(s: State) u8 {
     };
 }
 
-pub fn partOne(input: []const u8) !u32 {
-    var result: u32 = 0;
+pub fn partOne(input: []const u8) !u64 {
+    var result: u64 = 0;
     var state = State.looking;
     var first: u32 = 0;
     var second: u32 = 0;
@@ -138,8 +138,8 @@ test "three part one" {
     try std.testing.expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !u32 {
-    var result: u32 = 0;
+pub fn partTwo(input: []const u8) !u64 {
+    var result: u64 = 0;
     var state = State.looking;
     var first: u32 = 0;
     var second: u32 = 0;

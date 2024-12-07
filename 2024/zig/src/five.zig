@@ -106,8 +106,8 @@ fn createEmptyRule() [100]bool {
     };
 }
 
-pub fn partOne(input: []const u8) !u32 {
-    var sum: u32 = 0;
+pub fn partOne(input: []const u8) !u64 {
+    var sum: u64 = 0;
     var parts = std.mem.split(u8, input, "\n\n");
     // All numbers are < 100
     var rules = std.AutoHashMap(u8, [100]bool).init(utils.allocator);
@@ -219,8 +219,8 @@ test "five part one" {
     try std.testing.expectEqual(expected, actual);
 }
 
-pub fn partTwo(input: []const u8) !u32 {
-    var sum: u32 = 0;
+pub fn partTwo(input: []const u8) !u64 {
+    var sum: u64 = 0;
     var parts = std.mem.split(u8, input, "\n\n");
     // All numbers are < 100
     var rules = std.AutoHashMap(u8, [100]bool).init(utils.allocator);
