@@ -9,4 +9,5 @@ comptime {
     _ = @import("src/eight.zig");
     _ = @import("src/nine.zig");
     _ = @import("src/ten.zig");
+    _ = @import("src/eleven.zig");
 }
