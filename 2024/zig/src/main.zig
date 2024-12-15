@@ -12,6 +12,7 @@ const ten = @import("ten.zig");
 const eleven = @import("eleven.zig");
 const twelve = @import("twelve.zig");
 const thirteen = @import("thirteen.zig");
+const fourteen = @import("fourteen.zig");
 const utils = @import("utils.zig");
 
 pub const std_options = .{
@@ -76,6 +77,10 @@ const days = [_]Day{ Day{
     .file = "../inputs/thirteen.txt",
     .partOne = thirteen.partOne,
     .partTwo = thirteen.partTwo,
+}, Day{
+    .file = "../inputs/fourteen.txt",
+    .partOne = fourteen.partOne,
+    .partTwo = fourteen.partTwo,
 } };
 
 const Result = struct {
