@@ -16,4 +16,5 @@ comptime {
     _ = @import("src/fifteen.zig");
     _ = @import("src/sixteen.zig");
     _ = @import("src/seventeen.zig");
+    _ = @import("src/eighteen.zig");
 }
