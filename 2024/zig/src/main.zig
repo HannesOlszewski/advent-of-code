@@ -23,166 +23,129 @@ pub const std_options = .{
 };
 
 const Day = struct {
+    num: u5,
     file: []const u8,
     partOne: *const fn ([]const u8) anyerror!u64,
     partTwo: *const fn ([]const u8) anyerror!u64,
 };
 
 const days = [_]Day{ Day{
+    .num = 1,
     .file = "../inputs/one.txt",
     .partOne = one.partOne,
     .partTwo = one.partTwo,
 }, Day{
+    .num = 2,
     .file = "../inputs/two.txt",
     .partOne = two.partOne,
     .partTwo = two.partTwo,
 }, Day{
+    .num = 3,
     .file = "../inputs/three.txt",
     .partOne = three.partOne,
     .partTwo = three.partTwo,
 }, Day{
+    .num = 4,
     .file = "../inputs/four.txt",
     .partOne = four.partOne,
     .partTwo = four.partTwo,
 }, Day{
+    .num = 5,
     .file = "../inputs/five.txt",
     .partOne = five.partOne,
     .partTwo = five.partTwo,
 }, Day{
+    .num = 6,
     .file = "../inputs/six.txt",
     .partOne = six.partOne,
     .partTwo = six.partTwo,
 }, Day{
+    .num = 7,
     .file = "../inputs/seven.txt",
     .partOne = seven.partOne,
     .partTwo = seven.partTwo,
 }, Day{
+    .num = 8,
     .file = "../inputs/eight.txt",
     .partOne = eight.partOne,
     .partTwo = eight.partTwo,
 }, Day{
+    .num = 9,
     .file = "../inputs/nine.txt",
     .partOne = nine.partOne,
     .partTwo = nine.partTwo,
 }, Day{
+    .num = 10,
     .file = "../inputs/ten.txt",
     .partOne = ten.partOne,
     .partTwo = ten.partTwo,
 }, Day{
+    .num = 11,
     .file = "../inputs/eleven.txt",
     .partOne = eleven.partOne,
     .partTwo = eleven.partTwo,
 }, Day{
+    .num = 12,
     .file = "../inputs/twelve.txt",
     .partOne = twelve.partOne,
     .partTwo = twelve.partTwo,
 }, Day{
+    .num = 13,
     .file = "../inputs/thirteen.txt",
     .partOne = thirteen.partOne,
     .partTwo = thirteen.partTwo,
 }, Day{
+    .num = 14,
     .file = "../inputs/fourteen.txt",
     .partOne = fourteen.partOne,
     .partTwo = fourteen.partTwo,
 }, Day{
+    .num = 15,
     .file = "../inputs/fifteen.txt",
     .partOne = fifteen.partOne,
     .partTwo = fifteen.partTwo,
 }, Day{
+    .num = 16,
     .file = "../inputs/sixteen.txt",
     .partOne = sixteen.partOne,
     .partTwo = sixteen.partTwo,
 }, Day{
+    .num = 17,
     .file = "../inputs/seventeen.txt",
     .partOne = seventeen.partOne,
     .partTwo = seventeen.partTwo,
 } };
 
 const Result = struct {
+    day: u64,
     partOne: u64,
-    timeOne: i64,
+    timeOne: u64,
     partTwo: u64,
-    timeTwo: i64,
+    timeTwo: u64,
 };
 
 fn printResultsTable(results: []const Result) !void {
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
-
-    var resOneLen: usize = 0;
-    var timeOneLen: usize = 0;
-    var resTwoLen: usize = 0;
-    var timeTwoLen: usize = 0;
+    var tbl = utils.Table().init(utils.allocator);
+    defer tbl.deinit();
+    var headers = [_][]const u8{""} ** 5;
+    headers[0] = "Day";
+    headers[1] = "Part 1";
+    headers[2] = "Time";
+    headers[3] = "Part 2";
+    headers[4] = "Time";
+    try tbl.setHeaders(&headers);
 
     for (results) |result| {
-        var buf: [256]u8 = undefined;
-        var len = (try std.fmt.bufPrint(&buf, "{}", .{result.partOne})).len;
-        if (resOneLen < len) {
-            resOneLen = len;
-        }
-
-        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeOne})).len;
-        if (timeOneLen < len) {
-            timeOneLen = len;
-        }
-
-        len = (try std.fmt.bufPrint(&buf, "{}", .{result.partTwo})).len;
-        if (resTwoLen < len) {
-            resTwoLen = len;
-        }
-
-        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeTwo})).len;
-        if (timeTwoLen < len) {
-            timeTwoLen = len;
-        }
+        var row = try utils.allocator.alloc([]u8, 5);
+        row[0] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.day});
+        row[1] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.partOne});
+        row[2] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.timeOne});
+        row[3] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.partTwo});
+        row[4] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.timeTwo});
+        try tbl.addRow(row);
     }
 
-    try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
-    try stdout.print("| Day | Part One Result | Time (μs) | Part Two Result | Time (μs) |\n", .{});
-    try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
-
-    for (0.., results) |i, result| {
-        const dayNum = i + 1;
-
-        if (dayNum < 10) {
-            try stdout.print("|   {} | ", .{dayNum});
-        } else {
-            try stdout.print("|  {} | ", .{dayNum});
-        }
-
-        var buf: [256]u8 = undefined;
-        var len = (try std.fmt.bufPrint(&buf, "{}", .{result.partOne})).len;
-        while (len < resOneLen or len < "Part One Result".len) {
-            try stdout.print(" ", .{});
-            len += 1;
-        }
-        try stdout.print("{} | ", .{result.partOne});
-
-        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeOne})).len;
-        while (len < timeOneLen or len < "Time (μs)".len - 1) {
-            try stdout.print(" ", .{});
-            len += 1;
-        }
-        try stdout.print("{} | ", .{result.timeOne});
-
-        len = (try std.fmt.bufPrint(&buf, "{}", .{result.partTwo})).len;
-        while (len < resTwoLen or len < "Part Two Result".len) {
-            try stdout.print(" ", .{});
-            len += 1;
-        }
-        try stdout.print("{} | ", .{result.partTwo});
-
-        len = (try std.fmt.bufPrint(&buf, "{}", .{result.timeTwo})).len;
-        while (len < timeTwoLen or len < "Time (μs)".len - 1) {
-            try stdout.print(" ", .{});
-            len += 1;
-        }
-        try stdout.print("{} |\n", .{result.timeTwo});
-    }
-
-    try stdout.print("+-----+-----------------+-----------+-----------------+-----------+\n", .{});
-    try bw.flush();
+    try tbl.print();
 }
 
 pub fn main() !void {
@@ -199,10 +162,11 @@ pub fn main() !void {
         const end: i64 = std.time.microTimestamp();
 
         try results.append(Result{
+            .day = @as(u64, day.num),
             .partOne = resultOne,
-            .timeOne = mid - start,
+            .timeOne = @bitCast(mid - start),
             .partTwo = resultTwo,
-            .timeTwo = end - mid,
+            .timeTwo = @bitCast(end - mid),
         });
     }
 
