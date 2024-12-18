@@ -145,9 +145,9 @@ fn printResultsTable(results: []const Result) !void {
         var row = try utils.allocator.alloc([]u8, 5);
         row[0] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.day});
         row[1] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.partOne});
-        row[2] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.timeOne});
+        row[2] = try std.fmt.allocPrint(utils.allocator, "{}", .{std.fmt.fmtDuration(result.timeOne)});
         row[3] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.partTwo});
-        row[4] = try std.fmt.allocPrint(utils.allocator, "{}", .{result.timeTwo});
+        row[4] = try std.fmt.allocPrint(utils.allocator, "{}", .{std.fmt.fmtDuration(result.timeTwo)});
         try tbl.addRow(row);
     }
 
@@ -161,18 +161,21 @@ pub fn main() !void {
 
     for (days) |day| {
         const input = try std.fs.cwd().readFile(day.file, &buffer);
-        const start: i64 = std.time.microTimestamp();
+        const start: i128 = std.time.nanoTimestamp();
         const resultOne = try day.partOne(input);
-        const mid: i64 = std.time.microTimestamp();
+        const mid: i128 = std.time.nanoTimestamp();
         const resultTwo = try day.partTwo(input);
-        const end: i64 = std.time.microTimestamp();
+        const end: i128 = std.time.nanoTimestamp();
+
+        const timeOne: i64 = @truncate(mid - start);
+        const timeTwo: i64 = @truncate(end - mid);
 
         try results.append(Result{
             .day = @as(u64, day.num),
             .partOne = resultOne,
-            .timeOne = @bitCast(mid - start),
+            .timeOne = @bitCast(timeOne),
             .partTwo = resultTwo,
-            .timeTwo = @bitCast(end - mid),
+            .timeTwo = @bitCast(timeTwo),
         });
     }
 
