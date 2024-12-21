@@ -19,6 +19,11 @@ const seventeen = @import("seventeen.zig");
 const eighteen = @import("eighteen.zig");
 const nineteen = @import("nineteen.zig");
 const twenty = @import("twenty.zig");
+const twentyone = @import("twentyone.zig");
+const twentytwo = @import("twentytwo.zig");
+const twentythree = @import("twentythree.zig");
+const twentyfour = @import("twentyfour.zig");
+const twentyfive = @import("twentyfive.zig");
 const utils = @import("utils.zig");
 
 pub const std_options = .{
@@ -132,6 +137,31 @@ const days = [_]Day{ Day{
     .file = "../inputs/twenty.txt",
     .partOne = twenty.partOne,
     .partTwo = twenty.partTwo,
+}, Day{
+    .num = 21,
+    .file = "../inputs/twentyone.txt",
+    .partOne = twentyone.partOne,
+    .partTwo = twentyone.partTwo,
+}, Day{
+    .num = 22,
+    .file = "../inputs/twentytwo.txt",
+    .partOne = twentytwo.partOne,
+    .partTwo = twentytwo.partTwo,
+}, Day{
+    .num = 23,
+    .file = "../inputs/twentythree.txt",
+    .partOne = twentythree.partOne,
+    .partTwo = twentythree.partTwo,
+}, Day{
+    .num = 24,
+    .file = "../inputs/twentyfour.txt",
+    .partOne = twentyfour.partOne,
+    .partTwo = twentyfour.partTwo,
+}, Day{
+    .num = 25,
+    .file = "../inputs/twentyfive.txt",
+    .partOne = twentyfive.partOne,
+    .partTwo = twentyfive.partTwo,
 } };
 
 const Result = struct {
@@ -170,8 +200,21 @@ pub fn main() !void {
     var buffer: [30000]u8 = undefined;
     var results = std.ArrayList(Result).init(utils.allocator);
     defer results.deinit();
+    var args = std.process.args();
+    _ = args.skip();
+    var daysToShow = std.AutoHashMap(u64, void).init(utils.allocator);
+    defer daysToShow.deinit();
+
+    while (args.next()) |str| {
+        const num = try std.fmt.parseInt(u64, str, 10);
+        try daysToShow.put(num, {});
+    }
 
     for (days) |day| {
+        if (daysToShow.count() > 0 and !daysToShow.contains(day.num)) {
+            continue;
+        }
+
         const input = try std.fs.cwd().readFile(day.file, &buffer);
         const start: i128 = std.time.nanoTimestamp();
         const resultOne = try day.partOne(input);

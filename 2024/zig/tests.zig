@@ -19,4 +19,9 @@ comptime {
     _ = @import("src/eighteen.zig");
     _ = @import("src/nineteen.zig");
     _ = @import("src/twenty.zig");
+    _ = @import("src/twentyone.zig");
+    _ = @import("src/twentytwo.zig");
+    _ = @import("src/twentythree.zig");
+    _ = @import("src/twentyfour.zig");
+    _ = @import("src/twentyfive.zig");
 }
