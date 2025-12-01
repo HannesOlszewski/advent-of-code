@@ -29,7 +29,7 @@ func NotYetImplemented(_ string) string {
 
 func main() {
 	days := [12]Day{
-		{"1", NotYetImplemented, NotYetImplemented},
+		{"1", DayOnePartOne, DayOnePartTwo},
 		{"2", NotYetImplemented, NotYetImplemented},
 		{"3", NotYetImplemented, NotYetImplemented},
 		{"4", NotYetImplemented, NotYetImplemented},
@@ -53,7 +53,7 @@ func main() {
 		before := time.Now()
 		partOneResult := day.PartOne(input)
 		between := time.Now()
-		partTwoResult := day.PartOne(input)
+		partTwoResult := day.PartTwo(input)
 		after := time.Now()
 		partOneDuration := between.Sub(before)
 		partTwoDuration := after.Sub(between)
