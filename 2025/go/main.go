@@ -30,17 +30,17 @@ func NotYetImplemented(_ string) string {
 func main() {
 	days := [12]Day{
 		{"1", DayOnePartOne, DayOnePartTwo},
-		{"2", NotYetImplemented, NotYetImplemented},
-		{"3", NotYetImplemented, NotYetImplemented},
-		{"4", NotYetImplemented, NotYetImplemented},
-		{"5", NotYetImplemented, NotYetImplemented},
-		{"6", NotYetImplemented, NotYetImplemented},
-		{"7", NotYetImplemented, NotYetImplemented},
-		{"8", NotYetImplemented, NotYetImplemented},
-		{"9", NotYetImplemented, NotYetImplemented},
-		{"10", NotYetImplemented, NotYetImplemented},
-		{"11", NotYetImplemented, NotYetImplemented},
-		{"12", NotYetImplemented, NotYetImplemented},
+		{"2", DayTwoPartOne, DayTwoPartTwo},
+		{"3", DayThreePartOne, DayThreePartTwo},
+		{"4", DayFourPartOne, DayFourPartTwo},
+		{"5", DayFivePartOne, DayFivePartTwo},
+		{"6", DaySixPartOne, DaySixPartTwo},
+		{"7", DaySevenPartOne, DaySevenPartTwo},
+		{"8", DayEightPartOne, DayEightPartTwo},
+		{"9", DayNinePartOne, DayNinePartTwo},
+		{"10", DayTenPartOne, DayTenPartTwo},
+		{"11", DayElevenPartOne, DayElevenPartTwo},
+		{"12", DayTwelvePartOne, DayTwelvePartTwo},
 	}
 
 	for _, day := range days {
