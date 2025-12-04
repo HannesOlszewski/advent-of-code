@@ -3,9 +3,18 @@ package main
 import "testing"
 
 func TestDayFourPartOne(t *testing.T) {
-	input := ``
+	input := `..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.`
 
-	expected := ""
+	expected := "13"
 
 	if actual := DayFourPartOne(input); actual != expected {
 		t.Fatalf("Expected %v but got %v", expected, actual)
@@ -13,9 +22,18 @@ func TestDayFourPartOne(t *testing.T) {
 }
 
 func TestDayFourPartTwo(t *testing.T) {
-	input := ``
+	input := `..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.`
 
-	expected := ""
+	expected := "43"
 
 	if actual := DayFourPartTwo(input); actual != expected {
 		t.Fatalf("Expected %v but got %v", expected, actual)
