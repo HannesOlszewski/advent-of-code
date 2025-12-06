@@ -3,9 +3,12 @@ package main
 import "testing"
 
 func TestDaySixPartOne(t *testing.T) {
-	input := ``
+	input := `123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  `
 
-	expected := ""
+	expected := "4277556"
 
 	if actual := DaySixPartOne(input); actual != expected {
 		t.Fatalf("Expected %v but got %v", expected, actual)
@@ -13,9 +16,17 @@ func TestDaySixPartOne(t *testing.T) {
 }
 
 func TestDaySixPartTwo(t *testing.T) {
-	input := ``
+	// 	input := `23 1328  51 64
+	// 45  64  387 23
+	//  6  98  215 314
+	// *  +    *   +  `
+	input := `123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  `
 
-	expected := ""
+	// expected := "3263828"
+	expected := "3263827"
 
 	if actual := DaySixPartTwo(input); actual != expected {
 		t.Fatalf("Expected %v but got %v", expected, actual)
