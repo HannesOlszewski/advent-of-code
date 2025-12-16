@@ -39,54 +39,69 @@ func tryButtons(history []int, buttons []int, target int) int {
 	return bestIterationCount
 }
 
-func DayTenPartOne(input string) string {
-	const lightsStart = '['
-	const wiringStart = '('
-	const lightOn = '#'
-	// const lightOff = '.'
+const (
+	lightsStart  = '['
+	wiringStart  = '('
+	joltageStart = '{'
+	lightOn      = '#'
+)
 
-	lines := strings.SplitSeq(input, "\n")
-	total := 0
+// const lightOff = '.'
 
-	for line := range lines {
-		parts := strings.SplitSeq(line, " ")
-		lights := 0
-		lightsTarget := 0
-		buttons := []int{}
+func parseLineAndTryButtons(line string, channel chan int) {
+	parts := strings.SplitSeq(line, " ")
+	lights := 0
+	lightsTarget := 0
+	buttons := []int{}
 
-		for part := range parts {
-			switch part[0] {
-			case lightsStart:
+	for part := range parts {
+		switch part[0] {
+		case lightsStart:
 
-				for i, char := range part[1 : len(part)-1] {
-					if char == lightOn {
-						lightsTarget |= 1 << i
-					}
+			for i, char := range part[1 : len(part)-1] {
+				if char == lightOn {
+					lightsTarget |= 1 << i
 				}
-			case wiringStart:
-				wirings := strings.SplitSeq(part[1:len(part)-1], ",")
-				button := 0
-
-				for char := range wirings {
-					num, err := strconv.Atoi(char)
-					if err != nil {
-						log.Fatal(err)
-					}
-					button |= 1 << num
-				}
-
-				buttons = append(buttons, button)
 			}
+		case wiringStart:
+			wirings := strings.SplitSeq(part[1:len(part)-1], ",")
+			button := 0
+
+			for char := range wirings {
+				num, err := strconv.Atoi(char)
+				if err != nil {
+					log.Fatal(err)
+				}
+				button |= 1 << num
+			}
+
+			buttons = append(buttons, button)
 		}
+	}
 
-		requiredButtonPresses := tryButtons([]int{lights}, buttons, lightsTarget)
+	requiredButtonPresses := tryButtons([]int{lights}, buttons, lightsTarget)
 
-		if requiredButtonPresses == -1 {
-			fmt.Println(line)
-			log.Fatalln("Could not find valid combination")
-		}
+	if requiredButtonPresses == -1 {
+		fmt.Println(line)
+		log.Fatalln("Could not find valid combination")
+	}
 
-		total += requiredButtonPresses
+	channel <- requiredButtonPresses
+}
+
+func DayTenPartOne(input string) string {
+	lines := strings.Split(input, "\n")
+	channel := make(chan int)
+	total := 0
+	processedLinesCount := 0
+
+	for _, line := range lines {
+		go parseLineAndTryButtons(line, channel)
+	}
+
+	for processedLinesCount < len(lines) {
+		total += <-channel
+		processedLinesCount++
 	}
 
 	return strconv.Itoa(total)
@@ -150,7 +165,7 @@ func patterns(coeffs [][]int) map[string]int {
 			// Sum the coefficient vectors for selected buttons
 			pattern := make([]int, numVariables)
 			for _, btnIdx := range buttons {
-				for j := 0; j < numVariables; j++ {
+				for j := range numVariables {
 					pattern[j] += coeffs[btnIdx][j]
 				}
 			}
@@ -192,7 +207,7 @@ func solveSingle(coeffs [][]int, goal []int) int {
 
 			// Check: pattern[i] <= goal[i] and same parity
 			valid := true
-			for i := 0; i < len(pattern); i++ {
+			for i := range pattern {
 				if pattern[i] > goal[i] || pattern[i]%2 != goal[i]%2 {
 					valid = false
 					break
@@ -201,7 +216,7 @@ func solveSingle(coeffs [][]int, goal []int) int {
 
 			if valid {
 				newGoal := make([]int, len(goal))
-				for i := 0; i < len(goal); i++ {
+				for i := range goal {
 					newGoal[i] = (goal[i] - pattern[i]) / 2
 				}
 				cost := patternCost + 2*solveSingleAux(newGoal)
@@ -218,54 +233,61 @@ func solveSingle(coeffs [][]int, goal []int) int {
 	return solveSingleAux(goal)
 }
 
-func DayTenPartTwo(input string) string {
-	// Mostly a copy (into go translated) of https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/
-	const lightsStart = '['
-	const wiringStart = '('
-	const joltageStart = '{'
+func parseLineAndSolveSingle(line string, channel chan int) {
+	parts := strings.SplitSeq(line, " ")
+	lightsCount := 0
+	var joltageTargets []int
+	buttons := [][]int{}
 
-	lines := strings.SplitSeq(input, "\n")
-	total := 0
+	for part := range parts {
+		switch part[0] {
+		case lightsStart:
+			lightsCount = len(part) - 2
+			joltageTargets = make([]int, 0, lightsCount)
+		case wiringStart:
+			wirings := strings.SplitSeq(part[1:len(part)-1], ",")
+			button := make([]int, lightsCount)
 
-	for line := range lines {
-		parts := strings.SplitSeq(line, " ")
-		lightsCount := 0
-		var joltageTargets []int
-		buttons := [][]int{}
-
-		for part := range parts {
-			switch part[0] {
-			case lightsStart:
-				lightsCount = len(part) - 2
-				joltageTargets = make([]int, 0, lightsCount)
-			case wiringStart:
-				wirings := strings.SplitSeq(part[1:len(part)-1], ",")
-				button := make([]int, lightsCount)
-
-				for char := range wirings {
-					num, err := strconv.Atoi(char)
-					if err != nil {
-						log.Fatal(err)
-					}
-					button[num] = 1
+			for char := range wirings {
+				num, err := strconv.Atoi(char)
+				if err != nil {
+					log.Fatal(err)
 				}
+				button[num] = 1
+			}
 
-				buttons = append(buttons, button)
-			case joltageStart:
-				levels := strings.SplitSeq(part[1:len(part)-1], ",")
+			buttons = append(buttons, button)
+		case joltageStart:
+			levels := strings.SplitSeq(part[1:len(part)-1], ",")
 
-				for char := range levels {
-					num, err := strconv.Atoi(char)
-					if err != nil {
-						log.Fatal(err)
-					}
-					joltageTargets = append(joltageTargets, num)
+			for char := range levels {
+				num, err := strconv.Atoi(char)
+				if err != nil {
+					log.Fatal(err)
 				}
+				joltageTargets = append(joltageTargets, num)
 			}
 		}
+	}
 
-		requiredButtonPresses := solveSingle(buttons, joltageTargets)
-		total += requiredButtonPresses
+	channel <- solveSingle(buttons, joltageTargets)
+}
+
+func DayTenPartTwo(input string) string {
+	// Mostly a copy (into go translated) of https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/
+
+	lines := strings.Split(input, "\n")
+	channel := make(chan int)
+	processedLinesCount := 0
+	total := 0
+
+	for _, line := range lines {
+		go parseLineAndSolveSingle(line, channel)
+	}
+
+	for processedLinesCount < len(lines) {
+		total += <-channel
+		processedLinesCount++
 	}
 
 	return strconv.Itoa(total)
