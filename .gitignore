@@ -1,3 +1,4 @@
 *.txt
+!**/inputs/0.txt
 .DS_Store
 
