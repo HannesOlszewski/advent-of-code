@@ -10,6 +10,11 @@ class DayOne implements DayInterface
     private const string DOWN = 'D';
     private const array START = [0, 0];
 
+    public function getDayNumber(): int
+    {
+        return 1;
+    }
+
     public function partOne(string $input): string
     {
         $steps = self::parseInput($input);

@@ -11,8 +11,8 @@ use Aoc16\Utility\FileUtility;
 /** @var list<DayInterface> $days */
 $days = [new DayOne()];
 
-foreach ($days as $i => $day) {
-    $dayIndex = $i + 1;
+foreach ($days as $day) {
+    $dayIndex = $day->getDayNumber();
     $input = FileUtility::readDayInputFile($dayIndex);
 
     $startOne = (int) hrtime(true);
