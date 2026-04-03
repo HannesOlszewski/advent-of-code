@@ -5,11 +5,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Aoc16\Day\DayInterface;
-use Aoc16\Day\DayOne;
 use Aoc16\Utility\FileUtility;
+use Aoc16\Utility\PhpClassLoadingUtility;
 
-/** @var list<DayInterface> $days */
-$days = [new DayOne()];
+$dayClasses = PhpClassLoadingUtility::findAndLoadImplementationsFromFiles(DayInterface::class, __DIR__ . '/Day');
+/** @var DayInterface[] $days */
+$days = array_map(static fn(string $class) => new $class(), $dayClasses);
+usort(
+    $days,
+    static fn(DayInterface $a, DayInterface $b) => $a->getDayNumber() <=> $b->getDayNumber(),
+);
 
 foreach ($days as $day) {
     $dayIndex = $day->getDayNumber();
