@@ -1,6 +1,6 @@
 <?php
 
-namespace Aoc16\Map;
+namespace App\Map;
 
 /**
  * @template T

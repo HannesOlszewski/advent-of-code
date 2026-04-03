@@ -1,8 +1,8 @@
 <?php
 
-namespace Aoc16\Model;
+namespace App\Model;
 
-use Aoc16\Enum\Direction;
+use App\Enum\Direction;
 
 class Step
 {

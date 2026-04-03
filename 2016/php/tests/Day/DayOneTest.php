@@ -1,8 +1,8 @@
 <?php
 
-namespace Aoc16\Tests\Day;
+namespace App\Tests\Day;
 
-use Aoc16\Day\DayOne;
+use App\Day\DayOne;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aoc16\Day;
+namespace App\Day;
 
 interface DayInterface
 {

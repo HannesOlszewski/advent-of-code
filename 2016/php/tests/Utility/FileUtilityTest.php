@@ -1,8 +1,8 @@
 <?php
 
-namespace Aoc16\Tests\Utility;
+namespace App\Tests\Utility;
 
-use Aoc16\Utility\FileUtility;
+use App\Utility\FileUtility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

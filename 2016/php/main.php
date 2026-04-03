@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-use Aoc16\Day\DayInterface;
-use Aoc16\Utility\FileUtility;
-use Aoc16\Utility\PhpClassLoadingUtility;
+use App\Day\DayInterface;
+use App\Utility\FileUtility;
+use App\Utility\PhpClassLoadingUtility;
 
-$dayClasses = PhpClassLoadingUtility::findAndLoadImplementationsFromFiles(DayInterface::class, __DIR__ . '/Day');
+$dayClasses = PhpClassLoadingUtility::findAndLoadImplementationsFromFiles(DayInterface::class, __DIR__ . '/src/Day');
 /** @var DayInterface[] $days */
 $days = array_map(static fn(string $class) => new $class(), $dayClasses);
 usort(

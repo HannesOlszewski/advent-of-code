@@ -1,11 +1,11 @@
 <?php
 
-namespace Aoc16\Day;
+namespace App\Day;
 
-use Aoc16\Enum\Direction;
-use Aoc16\Map\StringHashMap;
-use Aoc16\Model\Point;
-use Aoc16\Model\Step;
+use App\Enum\Direction;
+use App\Map\StringHashMap;
+use App\Model\Point;
+use App\Model\Step;
 
 class DayOne implements DayInterface
 {

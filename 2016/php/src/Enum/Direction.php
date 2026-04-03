@@ -1,6 +1,6 @@
 <?php
 
-namespace Aoc16\Enum;
+namespace App\Enum;
 
 enum Direction: string
 {

@@ -1,16 +1,20 @@
 <?php
 
-namespace Aoc16\Utility;
+namespace App\Utility;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
 class PhpClassLoadingUtility
 {
+    /**
+     * @return array<class-string>
+     */
     public static function findAndLoadImplementationsFromFiles(string $interface, string $path): array
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
 
+        /** @var \SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile() || 'php' !== $file->getExtension()) {
                 continue;

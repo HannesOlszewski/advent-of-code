@@ -1,6 +1,6 @@
 <?php
 
-namespace Aoc16\Utility;
+namespace App\Utility;
 
 class FileUtility
 {
