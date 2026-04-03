@@ -16,19 +16,36 @@ usort(
     static fn(DayInterface $a, DayInterface $b) => $a->getDayNumber() <=> $b->getDayNumber(),
 );
 
+$red = "\033[31m";
+$green = "\033[32m";
+$yellow = "\033[33m";
+$bold = "\033[1m";
+$nc = "\033[0m";
+
+$successMark = "✔";
+$errorMark = "✖";
+
 foreach ($days as $day) {
     $dayIndex = $day->getDayNumber();
     $input = FileUtility::readDayInputFile($dayIndex);
 
-    $startOne = (int) hrtime(true);
-    $resultOne = $day->partOne($input);
-    $endOne = (int) hrtime(true);
-    $timeOneMicroSeconds = ($endOne - $startOne) / 1000;
-    echo \sprintf("Day %d.1: %s (took %dμs)\n", $dayIndex, $resultOne, $timeOneMicroSeconds);
+    try {
+        $startOne = (int) hrtime(true);
+        $resultOne = $day->partOne($input);
+        $endOne = (int) hrtime(true);
+        $timeOneMicroSeconds = ($endOne - $startOne) / 1000;
+        echo \sprintf(" $green$successMark$nc Day %d.1: $bold%s$nc $yellow(took %dμs)$nc\n", $dayIndex, $resultOne, $timeOneMicroSeconds);
+    } catch (\Throwable $e) {
+        echo \sprintf(" $red$errorMark$nc Day %d.1:$red$bold [ERROR] %s$nc\n", $dayIndex, $e->getMessage());
+    }
 
-    $startTwo = (int) hrtime(true);
-    $resultTwo = $day->partTwo($input);
-    $endTwo = (int) hrtime(true);
-    $timeTwoMicroSeconds = ($endTwo - $startTwo) / 1000;
-    echo \sprintf("Day %d.2: %s (took %dμs)\n", $dayIndex, $resultTwo, $timeTwoMicroSeconds);
+    try {
+        $startTwo = (int) hrtime(true);
+        $resultTwo = $day->partTwo($input);
+        $endTwo = (int) hrtime(true);
+        $timeTwoMicroSeconds = ($endTwo - $startTwo) / 1000;
+        echo \sprintf(" $green$successMark$nc Day %d.2: $bold%s$nc $yellow(took %dμs)$nc\n", $dayIndex, $resultTwo, $timeTwoMicroSeconds);
+    } catch (\Throwable $e) {
+        echo \sprintf(" $red$errorMark$nc Day %d.2:$red$bold [ERROR] %s$nc\n", $dayIndex, $e->getMessage());
+    }
 }
